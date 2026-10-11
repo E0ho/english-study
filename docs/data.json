@@ -1,0 +1,146 @@
+{
+  "builtAt": "2026-10-11T04:55:39.050Z",
+  "categories": [
+    "단어",
+    "문법",
+    "패턴",
+    "표현"
+  ],
+  "cards": [
+    {
+      "id": "8fded78c8e",
+      "category": "단어",
+      "front": "look forward to",
+      "meaning": "~을 고대하다",
+      "example": "I'm looking forward to seeing you.",
+      "note": "to 뒤에 동명사가 온다",
+      "title": "원어민이 매일 쓰는 일상회화 표현 (예시 노트)",
+      "source": "https://www.youtube.com/",
+      "date": "2026-10-11",
+      "tags": [
+        "일상회화",
+        "예시"
+      ]
+    },
+    {
+      "id": "adf5ecea0c",
+      "category": "단어",
+      "front": "run into",
+      "meaning": "우연히 마주치다",
+      "example": "I ran into my old teacher at the mall.",
+      "note": "",
+      "title": "원어민이 매일 쓰는 일상회화 표현 (예시 노트)",
+      "source": "https://www.youtube.com/",
+      "date": "2026-10-11",
+      "tags": [
+        "일상회화",
+        "예시"
+      ]
+    },
+    {
+      "id": "ca0410e9ef",
+      "category": "단어",
+      "front": "figure out",
+      "meaning": "알아내다, 이해하다",
+      "example": "I can't figure out how this app works.",
+      "note": "",
+      "title": "원어민이 매일 쓰는 일상회화 표현 (예시 노트)",
+      "source": "https://www.youtube.com/",
+      "date": "2026-10-11",
+      "tags": [
+        "일상회화",
+        "예시"
+      ]
+    },
+    {
+      "id": "3c5078bbab",
+      "category": "문법",
+      "front": "현재완료 vs 단순과거",
+      "meaning": "현재와 연결되면 현재완료, 끝난 시점이 명시되면 단순과거",
+      "example": "I have lived here for 3 years. / I lived there in 2020.",
+      "note": "yesterday, in 2020, last week 같은 과거 시점 표현이 있으면 무조건 단순과거",
+      "title": "원어민이 매일 쓰는 일상회화 표현 (예시 노트)",
+      "source": "https://www.youtube.com/",
+      "date": "2026-10-11",
+      "tags": [
+        "일상회화",
+        "예시"
+      ]
+    },
+    {
+      "id": "76fddd4868",
+      "category": "문법",
+      "front": "관사 a vs the",
+      "meaning": "처음 언급하거나 여러 개 중 하나면 a, 서로 아는 특정한 것이면 the",
+      "example": "I saw a dog. The dog was huge.",
+      "note": "",
+      "title": "원어민이 매일 쓰는 일상회화 표현 (예시 노트)",
+      "source": "https://www.youtube.com/",
+      "date": "2026-10-11",
+      "tags": [
+        "일상회화",
+        "예시"
+      ]
+    },
+    {
+      "id": "9bd879f519",
+      "category": "패턴",
+      "front": "It's been a while since ~",
+      "meaning": "~한 지 오래됐다",
+      "example": "It's been a while since we talked.",
+      "note": "",
+      "title": "원어민이 매일 쓰는 일상회화 표현 (예시 노트)",
+      "source": "https://www.youtube.com/",
+      "date": "2026-10-11",
+      "tags": [
+        "일상회화",
+        "예시"
+      ]
+    },
+    {
+      "id": "b4ceb2d262",
+      "category": "패턴",
+      "front": "I was wondering if you could ~",
+      "meaning": "혹시 ~해 주실 수 있을까요 (정중한 부탁)",
+      "example": "I was wondering if you could help me with this.",
+      "note": "",
+      "title": "원어민이 매일 쓰는 일상회화 표현 (예시 노트)",
+      "source": "https://www.youtube.com/",
+      "date": "2026-10-11",
+      "tags": [
+        "일상회화",
+        "예시"
+      ]
+    },
+    {
+      "id": "2e80b42490",
+      "category": "표현",
+      "front": "No worries",
+      "meaning": "괜찮아요, 신경 쓰지 마세요",
+      "example": "A: Sorry I'm late. B: No worries.",
+      "note": "",
+      "title": "원어민이 매일 쓰는 일상회화 표현 (예시 노트)",
+      "source": "https://www.youtube.com/",
+      "date": "2026-10-11",
+      "tags": [
+        "일상회화",
+        "예시"
+      ]
+    },
+    {
+      "id": "c8b20bef47",
+      "category": "표현",
+      "front": "I'm on it",
+      "meaning": "지금 바로 할게요",
+      "example": "Can you send the file? — I'm on it.",
+      "note": "",
+      "title": "원어민이 매일 쓰는 일상회화 표현 (예시 노트)",
+      "source": "https://www.youtube.com/",
+      "date": "2026-10-11",
+      "tags": [
+        "일상회화",
+        "예시"
+      ]
+    }
+  ]
+}

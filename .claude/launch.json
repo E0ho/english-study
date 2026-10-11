@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "app",
+      "runtimeExecutable": "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3",
+      "runtimeArgs": ["-u", "-m", "http.server", "8080", "--bind", "127.0.0.1", "--directory", "/Users/yeongho/Desktop/영어 공부/docs"],
+      "port": 8080
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1b1b1a" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="영어 복습">
+  <title>영어 복습</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="app">
+    <section id="view-review" class="view active">
+      <header class="topbar">
+        <h1>복습</h1>
+        <div class="counts">
+          <span>복습 <b id="due-count">0</b></span>
+          <span>새 카드 <b id="new-count">0</b></span>
+        </div>
+      </header>
+      <div id="review-body"></div>
+    </section>
+
+    <section id="view-list" class="view">
+      <header class="topbar">
+        <h1>목록</h1>
+        <span class="muted" id="list-total"></span>
+      </header>
+      <input id="search" type="search" placeholder="영어 또는 한국어로 검색" autocomplete="off">
+      <div id="chips" class="chips"></div>
+      <div id="list-body"></div>
+    </section>
+
+    <section id="view-stats" class="view">
+      <header class="topbar">
+        <h1>통계</h1>
+      </header>
+      <div id="stats-body"></div>
+    </section>
+  </main>
+
+  <nav class="tabs">
+    <button data-view="review" class="active">복습</button>
+    <button data-view="list">목록</button>
+    <button data-view="stats">통계</button>
+  </nav>
+  <div id="toast" class="toast" hidden></div>
+  <script src="app.js"></script>
+</body>
+</html>
