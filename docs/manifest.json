@@ -1,6 +1,6 @@
 {
-  "name": "영어 복습",
-  "short_name": "영어 복습",
+  "name": "영어 공부",
+  "short_name": "영어 공부",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

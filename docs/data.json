@@ -1,93 +1,53 @@
 {
-  "builtAt": "2026-10-11T04:55:39.050Z",
+  "builtAt": "2026-10-13T21:49:28.645Z",
   "categories": [
-    "단어",
-    "문법",
     "패턴",
     "표현"
   ],
   "cards": [
     {
-      "id": "8fded78c8e",
-      "category": "단어",
-      "front": "look forward to",
-      "meaning": "~을 고대하다",
-      "example": "I'm looking forward to seeing you.",
-      "note": "to 뒤에 동명사가 온다",
-      "title": "원어민이 매일 쓰는 일상회화 표현 (예시 노트)",
-      "source": "https://www.youtube.com/",
-      "date": "2026-10-11",
-      "tags": [
-        "일상회화",
-        "예시"
-      ]
-    },
-    {
-      "id": "adf5ecea0c",
-      "category": "단어",
-      "front": "run into",
-      "meaning": "우연히 마주치다",
-      "example": "I ran into my old teacher at the mall.",
-      "note": "",
-      "title": "원어민이 매일 쓰는 일상회화 표현 (예시 노트)",
-      "source": "https://www.youtube.com/",
-      "date": "2026-10-11",
-      "tags": [
-        "일상회화",
-        "예시"
-      ]
-    },
-    {
-      "id": "ca0410e9ef",
-      "category": "단어",
-      "front": "figure out",
-      "meaning": "알아내다, 이해하다",
-      "example": "I can't figure out how this app works.",
-      "note": "",
-      "title": "원어민이 매일 쓰는 일상회화 표현 (예시 노트)",
-      "source": "https://www.youtube.com/",
-      "date": "2026-10-11",
-      "tags": [
-        "일상회화",
-        "예시"
-      ]
-    },
-    {
-      "id": "3c5078bbab",
-      "category": "문법",
-      "front": "현재완료 vs 단순과거",
-      "meaning": "현재와 연결되면 현재완료, 끝난 시점이 명시되면 단순과거",
-      "example": "I have lived here for 3 years. / I lived there in 2020.",
-      "note": "yesterday, in 2020, last week 같은 과거 시점 표현이 있으면 무조건 단순과거",
-      "title": "원어민이 매일 쓰는 일상회화 표현 (예시 노트)",
-      "source": "https://www.youtube.com/",
-      "date": "2026-10-11",
-      "tags": [
-        "일상회화",
-        "예시"
-      ]
-    },
-    {
-      "id": "76fddd4868",
-      "category": "문법",
-      "front": "관사 a vs the",
-      "meaning": "처음 언급하거나 여러 개 중 하나면 a, 서로 아는 특정한 것이면 the",
-      "example": "I saw a dog. The dog was huge.",
-      "note": "",
-      "title": "원어민이 매일 쓰는 일상회화 표현 (예시 노트)",
-      "source": "https://www.youtube.com/",
-      "date": "2026-10-11",
-      "tags": [
-        "일상회화",
-        "예시"
-      ]
-    },
-    {
       "id": "9bd879f519",
       "category": "패턴",
       "front": "It's been a while since ~",
       "meaning": "~한 지 오래됐다",
-      "example": "It's been a while since we talked.",
+      "examples": [
+        {
+          "en": "It's been a while since we talked.",
+          "mark": "It's been a while since",
+          "ko": "우리가 얘기한 지 오래됐네.",
+          "koMark": "한 지 오래됐네",
+          "grammar": [
+            {
+              "name": "현재완료",
+              "desc": "It has been: 과거부터 지금까지 이어진 기간",
+              "articleId": ""
+            },
+            {
+              "name": "접속사 since",
+              "desc": "since 뒤 절은 과거시제",
+              "articleId": ""
+            }
+          ]
+        },
+        {
+          "en": "It's been a while since I last went to the gym.",
+          "mark": "It's been a while since",
+          "ko": "마지막으로 헬스장에 간 지 오래됐어.",
+          "koMark": "간 지 오래됐어",
+          "grammar": [
+            {
+              "name": "현재완료",
+              "desc": "It has been",
+              "articleId": ""
+            },
+            {
+              "name": "접속사 since",
+              "desc": "since 뒤 절은 과거시제",
+              "articleId": ""
+            }
+          ]
+        }
+      ],
       "note": "",
       "title": "원어민이 매일 쓰는 일상회화 표현 (예시 노트)",
       "source": "https://www.youtube.com/",
@@ -95,14 +55,52 @@
       "tags": [
         "일상회화",
         "예시"
-      ]
+      ],
+      "example": "It's been a while since we talked. 우리가 얘기한 지 오래됐네.\nIt's been a while since I last went to the gym. 마지막으로 헬스장에 간 지 오래됐어."
     },
     {
       "id": "b4ceb2d262",
       "category": "패턴",
       "front": "I was wondering if you could ~",
       "meaning": "혹시 ~해 주실 수 있을까요 (정중한 부탁)",
-      "example": "I was wondering if you could help me with this.",
+      "examples": [
+        {
+          "en": "I was wondering if you could help me with this.",
+          "mark": "I was wondering if you could",
+          "ko": "혹시 이것 좀 도와주실 수 있을까요?",
+          "koMark": "주실 수 있을까요",
+          "grammar": [
+            {
+              "name": "과거진행형",
+              "desc": "was wondering: 현재의 부탁을 과거형으로 말해 더 정중하게",
+              "articleId": ""
+            },
+            {
+              "name": "간접의문문",
+              "desc": "if + 주어 + 동사 어순",
+              "articleId": ""
+            }
+          ]
+        },
+        {
+          "en": "I was wondering if you could send me the file by tomorrow.",
+          "mark": "I was wondering if you could",
+          "ko": "혹시 내일까지 그 파일을 보내주실 수 있을까요?",
+          "koMark": "주실 수 있을까요",
+          "grammar": [
+            {
+              "name": "간접의문문",
+              "desc": "if + 주어 + 동사 어순",
+              "articleId": ""
+            },
+            {
+              "name": "4형식 문장",
+              "desc": "send + 사람 + 사물",
+              "articleId": ""
+            }
+          ]
+        }
+      ],
       "note": "",
       "title": "원어민이 매일 쓰는 일상회화 표현 (예시 노트)",
       "source": "https://www.youtube.com/",
@@ -110,14 +108,191 @@
       "tags": [
         "일상회화",
         "예시"
-      ]
+      ],
+      "example": "I was wondering if you could help me with this. 혹시 이것 좀 도와주실 수 있을까요?\nI was wondering if you could send me the file by tomorrow. 혹시 내일까지 그 파일을 보내주실 수 있을까요?"
+    },
+    {
+      "id": "47642906e6",
+      "category": "표현",
+      "front": "look forward to",
+      "meaning": "~을 고대하다",
+      "examples": [
+        {
+          "en": "I'm looking forward to seeing you.",
+          "mark": "looking forward to",
+          "ko": "널 만나기를 고대하고 있어.",
+          "koMark": "고대하고 있어",
+          "grammar": [
+            {
+              "name": "현재진행형",
+              "desc": "am looking",
+              "articleId": ""
+            },
+            {
+              "name": "전치사 to + 동명사",
+              "desc": "이 to는 to부정사가 아니라 전치사라서 seeing",
+              "articleId": ""
+            }
+          ]
+        },
+        {
+          "en": "We look forward to your reply.",
+          "mark": "look forward to",
+          "ko": "답장을 기다리겠습니다.",
+          "koMark": "기다리겠습니다",
+          "grammar": [
+            {
+              "name": "전치사 to + 명사",
+              "desc": "to 뒤에 명사가 바로 옴",
+              "articleId": ""
+            }
+          ]
+        }
+      ],
+      "note": "to 뒤에 동명사나 명사가 온다. 동사원형을 쓰면 틀린다",
+      "title": "원어민이 매일 쓰는 일상회화 표현 (예시 노트)",
+      "source": "https://www.youtube.com/",
+      "date": "2026-10-11",
+      "tags": [
+        "일상회화",
+        "예시"
+      ],
+      "example": "I'm looking forward to seeing you. 널 만나기를 고대하고 있어.\nWe look forward to your reply. 답장을 기다리겠습니다."
+    },
+    {
+      "id": "e0985e51d2",
+      "category": "표현",
+      "front": "run into",
+      "meaning": "우연히 마주치다",
+      "examples": [
+        {
+          "en": "I ran into my old teacher at the mall.",
+          "mark": "ran into",
+          "ko": "쇼핑몰에서 옛 선생님을 우연히 마주쳤어.",
+          "koMark": "우연히 마주쳤어",
+          "grammar": [
+            {
+              "name": "단순과거",
+              "desc": "ran: run의 불규칙 과거형",
+              "articleId": ""
+            }
+          ]
+        },
+        {
+          "en": "You'll never guess who I ran into yesterday.",
+          "mark": "ran into",
+          "ko": "내가 어제 누굴 마주쳤는지 넌 짐작도 못 할 거야.",
+          "koMark": "마주쳤는지",
+          "grammar": [
+            {
+              "name": "간접의문문",
+              "desc": "who + 주어 + 동사 어순",
+              "articleId": ""
+            },
+            {
+              "name": "미래 will",
+              "desc": "You'll never guess",
+              "articleId": ""
+            }
+          ]
+        }
+      ],
+      "note": "",
+      "title": "원어민이 매일 쓰는 일상회화 표현 (예시 노트)",
+      "source": "https://www.youtube.com/",
+      "date": "2026-10-11",
+      "tags": [
+        "일상회화",
+        "예시"
+      ],
+      "example": "I ran into my old teacher at the mall. 쇼핑몰에서 옛 선생님을 우연히 마주쳤어.\nYou'll never guess who I ran into yesterday. 내가 어제 누굴 마주쳤는지 넌 짐작도 못 할 거야."
+    },
+    {
+      "id": "8a4f9a5eed",
+      "category": "표현",
+      "front": "figure out",
+      "meaning": "알아내다, 이해하다",
+      "examples": [
+        {
+          "en": "I can't figure out how this app works.",
+          "mark": "figure out",
+          "ko": "이 앱이 어떻게 작동하는지 모르겠어.",
+          "koMark": "모르겠어",
+          "grammar": [
+            {
+              "name": "조동사 can",
+              "desc": "can't + 동사원형",
+              "articleId": ""
+            },
+            {
+              "name": "간접의문문",
+              "desc": "how + 주어 + 동사 어순",
+              "articleId": ""
+            }
+          ]
+        },
+        {
+          "en": "I'm trying to figure out what went wrong.",
+          "mark": "figure out",
+          "ko": "뭐가 잘못됐는지 알아내려는 중이야.",
+          "koMark": "알아내려는",
+          "grammar": [
+            {
+              "name": "to부정사 명사적 용법",
+              "desc": "try의 목적어",
+              "articleId": "5da1f024"
+            },
+            {
+              "name": "간접의문문",
+              "desc": "what이 주어인 경우 what + 동사",
+              "articleId": ""
+            }
+          ]
+        }
+      ],
+      "note": "",
+      "title": "원어민이 매일 쓰는 일상회화 표현 (예시 노트)",
+      "source": "https://www.youtube.com/",
+      "date": "2026-10-11",
+      "tags": [
+        "일상회화",
+        "예시"
+      ],
+      "example": "I can't figure out how this app works. 이 앱이 어떻게 작동하는지 모르겠어.\nI'm trying to figure out what went wrong. 뭐가 잘못됐는지 알아내려는 중이야."
     },
     {
       "id": "2e80b42490",
       "category": "표현",
       "front": "No worries",
       "meaning": "괜찮아요, 신경 쓰지 마세요",
-      "example": "A: Sorry I'm late. B: No worries.",
+      "examples": [
+        {
+          "en": "A: Sorry I'm late. B: No worries.",
+          "mark": "No worries",
+          "ko": "A: 늦어서 미안해. B: 괜찮아.",
+          "koMark": "괜찮아",
+          "grammar": [
+            {
+              "name": "생략",
+              "desc": "I'm sorry that I'm late 에서 주어와 that 생략",
+              "articleId": ""
+            }
+          ]
+        },
+        {
+          "en": "No worries, I can do it myself.",
+          "mark": "No worries",
+          "ko": "괜찮아, 내가 직접 할 수 있어.",
+          "koMark": "괜찮아",
+          "grammar": [
+            {
+              "name": "재귀대명사 강조 용법",
+              "desc": "myself: 직접, 스스로",
+              "articleId": ""
+            }
+          ]
+        }
+      ],
       "note": "",
       "title": "원어민이 매일 쓰는 일상회화 표현 (예시 노트)",
       "source": "https://www.youtube.com/",
@@ -125,14 +300,47 @@
       "tags": [
         "일상회화",
         "예시"
-      ]
+      ],
+      "example": "A: Sorry I'm late. B: No worries. A: 늦어서 미안해. B: 괜찮아.\nNo worries, I can do it myself. 괜찮아, 내가 직접 할 수 있어."
     },
     {
       "id": "c8b20bef47",
       "category": "표현",
       "front": "I'm on it",
       "meaning": "지금 바로 할게요",
-      "example": "Can you send the file? — I'm on it.",
+      "examples": [
+        {
+          "en": "A: Can you send the file? B: I'm on it.",
+          "mark": "I'm on it",
+          "ko": "A: 파일 보내줄 수 있어? B: 바로 할게.",
+          "koMark": "바로 할게",
+          "grammar": [
+            {
+              "name": "조동사 can 의문문",
+              "desc": "요청",
+              "articleId": ""
+            },
+            {
+              "name": "전치사 on",
+              "desc": "어떤 일에 착수한 상태",
+              "articleId": ""
+            }
+          ]
+        },
+        {
+          "en": "Don't worry about the report. I'm on it.",
+          "mark": "I'm on it",
+          "ko": "보고서는 걱정하지 마. 내가 하고 있어.",
+          "koMark": "내가 하고 있어",
+          "grammar": [
+            {
+              "name": "부정 명령문",
+              "desc": "Don't + 동사원형",
+              "articleId": ""
+            }
+          ]
+        }
+      ],
       "note": "",
       "title": "원어민이 매일 쓰는 일상회화 표현 (예시 노트)",
       "source": "https://www.youtube.com/",
@@ -140,7 +348,8 @@
       "tags": [
         "일상회화",
         "예시"
-      ]
+      ],
+      "example": "A: Can you send the file? B: I'm on it. A: 파일 보내줄 수 있어? B: 바로 할게.\nDon't worry about the report. I'm on it. 보고서는 걱정하지 마. 내가 하고 있어."
     }
   ]
 }
