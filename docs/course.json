@@ -1,0 +1,736 @@
+{
+  "builtAt": "2026-10-27T12:45:52.458Z",
+  "levels": [
+    {
+      "level": 1,
+      "name": "기초",
+      "goal": "OPIc IM",
+      "months": "0~6개월",
+      "desc": "문장으로 일상을 말할 수 있다",
+      "parts": [
+        {
+          "name": "1부 문장의 뼈대",
+          "units": [
+            {
+              "n": 1,
+              "title": "영어 어순",
+              "kind": "grammar"
+            },
+            {
+              "n": 2,
+              "title": "be동사 vs 일반동사",
+              "kind": "grammar"
+            },
+            {
+              "n": 3,
+              "title": "시제 한눈에 보기",
+              "kind": "grammar"
+            },
+            {
+              "n": 4,
+              "title": "현재완료",
+              "kind": "grammar"
+            },
+            {
+              "n": 5,
+              "title": "질문 만들기",
+              "kind": "grammar"
+            }
+          ]
+        },
+        {
+          "name": "2부 의도와 기분",
+          "units": [
+            {
+              "n": 6,
+              "title": "조동사",
+              "kind": "grammar"
+            },
+            {
+              "n": 7,
+              "title": "부탁·제안·허락",
+              "kind": "grammar"
+            },
+            {
+              "n": 8,
+              "title": "미래 표현 3가지",
+              "kind": "grammar"
+            },
+            {
+              "n": 9,
+              "title": "감각동사 + 형용사",
+              "kind": "grammar"
+            },
+            {
+              "n": 10,
+              "title": "빈도·습관 표현",
+              "kind": "grammar"
+            }
+          ]
+        },
+        {
+          "name": "3부 문장 늘리기",
+          "units": [
+            {
+              "n": 11,
+              "title": "to부정사",
+              "kind": "grammar"
+            },
+            {
+              "n": 12,
+              "title": "동명사 vs to부정사",
+              "kind": "grammar"
+            },
+            {
+              "n": 13,
+              "title": "접속사",
+              "kind": "grammar"
+            },
+            {
+              "n": 14,
+              "title": "관계대명사",
+              "kind": "grammar"
+            },
+            {
+              "n": 15,
+              "title": "비교급·최상급",
+              "kind": "grammar"
+            }
+          ]
+        },
+        {
+          "name": "4부 기본 회화 도구",
+          "units": [
+            {
+              "n": 16,
+              "title": "구동사",
+              "kind": "grammar"
+            },
+            {
+              "n": 17,
+              "title": "전치사 in·on·at",
+              "kind": "grammar"
+            },
+            {
+              "n": 18,
+              "title": "관사 a·the",
+              "kind": "grammar"
+            },
+            {
+              "n": 19,
+              "title": "숫자·시간·가격 말하기",
+              "kind": "grammar"
+            },
+            {
+              "n": 20,
+              "title": "리액션·맞장구",
+              "kind": "grammar"
+            }
+          ]
+        },
+        {
+          "name": "5부 OPIc IM 말하기",
+          "units": [
+            {
+              "n": 21,
+              "title": "자기소개",
+              "kind": "speak"
+            },
+            {
+              "n": 22,
+              "title": "내 집·동네 묘사",
+              "kind": "speak"
+            },
+            {
+              "n": 23,
+              "title": "하루 일과",
+              "kind": "speak"
+            },
+            {
+              "n": 24,
+              "title": "취미·주말",
+              "kind": "speak"
+            },
+            {
+              "n": 25,
+              "title": "직장·학교 이야기",
+              "kind": "speak"
+            },
+            {
+              "n": 26,
+              "title": "과거 경험 하나 말하기",
+              "kind": "speak"
+            }
+          ]
+        },
+        {
+          "name": "부록 A 상황 회화",
+          "units": [
+            {
+              "n": 27,
+              "title": "주문하기",
+              "kind": "situation"
+            },
+            {
+              "n": 28,
+              "title": "길 묻기·교통",
+              "kind": "situation"
+            },
+            {
+              "n": 29,
+              "title": "쇼핑",
+              "kind": "situation"
+            },
+            {
+              "n": 30,
+              "title": "약속 잡기·거절",
+              "kind": "situation"
+            },
+            {
+              "n": 31,
+              "title": "전화·문자",
+              "kind": "situation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "name": "중급",
+      "goal": "OPIc IH",
+      "months": "6~18개월",
+      "desc": "길게 이어 말하고, 돌발 상황을 풀 수 있다",
+      "parts": [
+        {
+          "name": "6부 이야기하기",
+          "units": [
+            {
+              "n": 32,
+              "title": "과거 이야기 구조",
+              "kind": "grammar"
+            },
+            {
+              "n": 33,
+              "title": "과거완료·과거진행",
+              "kind": "grammar"
+            },
+            {
+              "n": 34,
+              "title": "시간 연결어",
+              "kind": "grammar"
+            },
+            {
+              "n": 35,
+              "title": "간접화법",
+              "kind": "grammar"
+            }
+          ]
+        },
+        {
+          "name": "7부 문법 확장",
+          "units": [
+            {
+              "n": 36,
+              "title": "가정법",
+              "kind": "grammar"
+            },
+            {
+              "n": 37,
+              "title": "수동태",
+              "kind": "grammar"
+            },
+            {
+              "n": 38,
+              "title": "사역동사",
+              "kind": "grammar"
+            },
+            {
+              "n": 39,
+              "title": "분사",
+              "kind": "grammar"
+            },
+            {
+              "n": 40,
+              "title": "관계부사·관계대명사 생략",
+              "kind": "grammar"
+            }
+          ]
+        },
+        {
+          "name": "8부 자연스러운 말",
+          "units": [
+            {
+              "n": 41,
+              "title": "담화 표지",
+              "kind": "grammar"
+            },
+            {
+              "n": 42,
+              "title": "완곡 표현",
+              "kind": "grammar"
+            },
+            {
+              "n": 43,
+              "title": "추측·확신",
+              "kind": "grammar"
+            },
+            {
+              "n": 44,
+              "title": "강조",
+              "kind": "grammar"
+            },
+            {
+              "n": 45,
+              "title": "줄임말·연음 듣기",
+              "kind": "grammar"
+            }
+          ]
+        },
+        {
+          "name": "9부 의견 말하기",
+          "units": [
+            {
+              "n": 46,
+              "title": "의견 말하는 틀",
+              "kind": "grammar"
+            },
+            {
+              "n": 47,
+              "title": "찬반·장단점",
+              "kind": "grammar"
+            },
+            {
+              "n": 48,
+              "title": "비교·대조",
+              "kind": "grammar"
+            },
+            {
+              "n": 49,
+              "title": "경험으로 근거 대기",
+              "kind": "grammar"
+            }
+          ]
+        },
+        {
+          "name": "10부 OPIc IH 롤플레이",
+          "units": [
+            {
+              "n": 50,
+              "title": "예약 변경",
+              "kind": "speak"
+            },
+            {
+              "n": 51,
+              "title": "환불·불만 제기",
+              "kind": "speak"
+            },
+            {
+              "n": 52,
+              "title": "문제 설명과 대안 제시",
+              "kind": "speak"
+            },
+            {
+              "n": 53,
+              "title": "정보 묻기 질문 3개",
+              "kind": "speak"
+            },
+            {
+              "n": 54,
+              "title": "친구에게 제안하기",
+              "kind": "speak"
+            }
+          ]
+        },
+        {
+          "name": "부록 B 상황 회화",
+          "units": [
+            {
+              "n": 55,
+              "title": "병원·약국",
+              "kind": "situation"
+            },
+            {
+              "n": 56,
+              "title": "은행·우체국",
+              "kind": "situation"
+            },
+            {
+              "n": 57,
+              "title": "호텔·공항",
+              "kind": "situation"
+            },
+            {
+              "n": 58,
+              "title": "집 문제 (수리·소음)",
+              "kind": "situation"
+            },
+            {
+              "n": 59,
+              "title": "모임·파티 스몰토크",
+              "kind": "situation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "level": 3,
+      "name": "고급",
+      "goal": "OPIc AL",
+      "months": "18~30개월",
+      "desc": "추상적인 주제도 자기 말로, 뉘앙스를 살려서",
+      "parts": [
+        {
+          "name": "11부 긴 문장과 구조",
+          "units": [
+            {
+              "n": 60,
+              "title": "도치·강조 구문",
+              "kind": "grammar"
+            },
+            {
+              "n": 61,
+              "title": "양보·대조",
+              "kind": "grammar"
+            },
+            {
+              "n": 62,
+              "title": "분사구문",
+              "kind": "grammar"
+            },
+            {
+              "n": 63,
+              "title": "명사절·동격",
+              "kind": "grammar"
+            },
+            {
+              "n": 64,
+              "title": "긴 문장 끊어 말하기",
+              "kind": "grammar"
+            }
+          ]
+        },
+        {
+          "name": "12부 어휘 깊이",
+          "units": [
+            {
+              "n": 65,
+              "title": "콜로케이션",
+              "kind": "grammar"
+            },
+            {
+              "n": 66,
+              "title": "뉘앙스 단어군",
+              "kind": "grammar"
+            },
+            {
+              "n": 67,
+              "title": "이디엄 100",
+              "kind": "grammar"
+            },
+            {
+              "n": 68,
+              "title": "추상 명사",
+              "kind": "grammar"
+            },
+            {
+              "n": 69,
+              "title": "바꿔 말하기",
+              "kind": "grammar"
+            }
+          ]
+        },
+        {
+          "name": "13부 토론·설명",
+          "units": [
+            {
+              "n": 70,
+              "title": "사회 이슈 의견",
+              "kind": "grammar"
+            },
+            {
+              "n": 71,
+              "title": "반박·양보·부분 동의",
+              "kind": "grammar"
+            },
+            {
+              "n": 72,
+              "title": "요약하고 되묻기",
+              "kind": "grammar"
+            },
+            {
+              "n": 73,
+              "title": "비유·예시로 설명",
+              "kind": "grammar"
+            },
+            {
+              "n": 74,
+              "title": "숫자·통계 말하기",
+              "kind": "grammar"
+            }
+          ]
+        },
+        {
+          "name": "14부 발음·억양",
+          "units": [
+            {
+              "n": 75,
+              "title": "문장 강세",
+              "kind": "grammar"
+            },
+            {
+              "n": 76,
+              "title": "억양 패턴",
+              "kind": "grammar"
+            },
+            {
+              "n": 77,
+              "title": "연음·탈락 규칙",
+              "kind": "grammar"
+            },
+            {
+              "n": 78,
+              "title": "쉐도잉 방법",
+              "kind": "grammar"
+            },
+            {
+              "n": 79,
+              "title": "빠른 말 듣기",
+              "kind": "grammar"
+            }
+          ]
+        },
+        {
+          "name": "15부 OPIc AL 말하기",
+          "units": [
+            {
+              "n": 80,
+              "title": "과거–현재 비교",
+              "kind": "speak"
+            },
+            {
+              "n": 81,
+              "title": "가정 질문",
+              "kind": "speak"
+            },
+            {
+              "n": 82,
+              "title": "사회 변화 설명",
+              "kind": "speak"
+            },
+            {
+              "n": 83,
+              "title": "기억에 남는 경험",
+              "kind": "speak"
+            },
+            {
+              "n": 84,
+              "title": "뉴스·이슈 설명",
+              "kind": "speak"
+            }
+          ]
+        },
+        {
+          "name": "부록 C 상황 회화",
+          "units": [
+            {
+              "n": 85,
+              "title": "격식 이메일",
+              "kind": "situation"
+            },
+            {
+              "n": 86,
+              "title": "발표·설명",
+              "kind": "situation"
+            },
+            {
+              "n": 87,
+              "title": "면접",
+              "kind": "situation"
+            },
+            {
+              "n": 88,
+              "title": "네트워킹",
+              "kind": "situation"
+            },
+            {
+              "n": 89,
+              "title": "감정 섬세하게 말하기",
+              "kind": "situation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "level": 4,
+      "name": "현지 생활",
+      "goal": "해외 생활",
+      "months": "30개월~",
+      "desc": "외국에서 사는 데 막히는 게 없다",
+      "parts": [
+        {
+          "name": "16부 행정·생활",
+          "units": [
+            {
+              "n": 90,
+              "title": "비자·이민",
+              "kind": "situation"
+            },
+            {
+              "n": 91,
+              "title": "집 계약·보증금",
+              "kind": "situation"
+            },
+            {
+              "n": 92,
+              "title": "은행 계좌·세금",
+              "kind": "situation"
+            },
+            {
+              "n": 93,
+              "title": "병원·보험",
+              "kind": "situation"
+            },
+            {
+              "n": 94,
+              "title": "운전·교통 위반",
+              "kind": "situation"
+            },
+            {
+              "n": 95,
+              "title": "공과금·인터넷",
+              "kind": "situation"
+            }
+          ]
+        },
+        {
+          "name": "17부 직장",
+          "units": [
+            {
+              "n": 96,
+              "title": "회의 표현",
+              "kind": "situation"
+            },
+            {
+              "n": 97,
+              "title": "피드백 주고받기",
+              "kind": "situation"
+            },
+            {
+              "n": 98,
+              "title": "거절·협상",
+              "kind": "situation"
+            },
+            {
+              "n": 99,
+              "title": "업무 메신저·이메일",
+              "kind": "situation"
+            },
+            {
+              "n": 100,
+              "title": "스몰토크",
+              "kind": "situation"
+            },
+            {
+              "n": 101,
+              "title": "동료 관계",
+              "kind": "situation"
+            }
+          ]
+        },
+        {
+          "name": "18부 문화 뉘앙스",
+          "units": [
+            {
+              "n": 102,
+              "title": "간접 거절과 공손함",
+              "kind": "situation"
+            },
+            {
+              "n": 103,
+              "title": "유머·농담 받기",
+              "kind": "situation"
+            },
+            {
+              "n": 104,
+              "title": "금기 주제",
+              "kind": "situation"
+            },
+            {
+              "n": 105,
+              "title": "감사·사과의 크기",
+              "kind": "situation"
+            },
+            {
+              "n": 106,
+              "title": "칭찬 주고받기",
+              "kind": "situation"
+            }
+          ]
+        },
+        {
+          "name": "19부 진짜 구어",
+          "units": [
+            {
+              "n": 107,
+              "title": "슬랭·줄임말",
+              "kind": "situation"
+            },
+            {
+              "n": 108,
+              "title": "문자 영어",
+              "kind": "situation"
+            },
+            {
+              "n": 109,
+              "title": "미국·영국·호주 억양",
+              "kind": "situation"
+            },
+            {
+              "n": 110,
+              "title": "속담·문화 레퍼런스",
+              "kind": "situation"
+            },
+            {
+              "n": 111,
+              "title": "욕과 완곡 표현 알아듣기",
+              "kind": "situation"
+            }
+          ]
+        },
+        {
+          "name": "20부 관계",
+          "units": [
+            {
+              "n": 112,
+              "title": "친구 사귀기",
+              "kind": "situation"
+            },
+            {
+              "n": 113,
+              "title": "이웃·집주인",
+              "kind": "situation"
+            },
+            {
+              "n": 114,
+              "title": "아이·학교",
+              "kind": "situation"
+            },
+            {
+              "n": 115,
+              "title": "갈등 풀기",
+              "kind": "situation"
+            },
+            {
+              "n": 116,
+              "title": "전화·고객센터 응대",
+              "kind": "situation"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

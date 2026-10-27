@@ -1,6 +1,6 @@
 // 오프라인 대비: 네트워크 우선(브라우저 HTTP 캐시는 건너뜀), 실패하면 캐시.
-const CACHE = 'eng-review-v14';
-const SHELL = ['./', './index.html', './style.css', './app.js', './data.json', './grammar.json', './manifest.json', './icon.svg'];
+const CACHE = 'eng-review-v17';
+const SHELL = ['./', './index.html', './style.css', './app.js', './data.json', './grammar.json', './course.json', './firebase-config.js', './manifest.json', './icon.svg'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));

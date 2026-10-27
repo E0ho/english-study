@@ -12,6 +12,9 @@ const NOTES_DIR = path.join(ROOT, 'notes');
 const GRAMMAR_DIR = path.join(ROOT, 'grammar');
 const OUT_DATA = path.join(ROOT, 'docs', 'data.json');
 const OUT_GRAMMAR = path.join(ROOT, 'docs', 'grammar.json');
+const OUT_COURSE = path.join(ROOT, 'docs', 'course.json');
+const CURRICULUM = require('./curriculum');
+const COURSE_UNITS = new Map(CURRICULUM.flatMap(lv => lv.parts.flatMap(p => p.units.map(un => [un.n, { ...un, part: p.name, level: lv.level }]))));
 
 const FIELD_MAP = { '뜻': 'meaning', '예문': 'example', '메모': 'note' };
 const GRAMMAR_CATS = new Set(['문법']);
@@ -290,7 +293,10 @@ function buildGrammar(warnings) {
     if (a.unit == null) { if (a.part) warnings.push(`"${a.title}" 에 part 만 있고 unit 이 없습니다`); continue; }
     if (units.has(a.unit)) warnings.push(`"${a.title}" 의 unit ${a.unit} 이 "${units.get(a.unit)}" 와 겹칩니다`);
     units.set(a.unit, a.title);
-    if (!a.part) warnings.push(`"${a.title}" 에 unit 은 있는데 part 가 없습니다`);
+    const cu = COURSE_UNITS.get(a.unit);
+    if (!cu) warnings.push(`"${a.title}" 의 unit ${a.unit} 이 scripts/curriculum.js 목차에 없습니다`);
+    else if (a.part && a.part !== cu.part) warnings.push(`"${a.title}" 의 part "${a.part}" 가 목차의 "${cu.part}" 와 다릅니다`);
+    if (cu) a.part = cu.part;   // 부 이름은 목차가 기준
   }
   fs.mkdirSync(path.dirname(OUT_GRAMMAR), { recursive: true });
   fs.writeFileSync(OUT_GRAMMAR, JSON.stringify({ builtAt: new Date().toISOString(), articles: articles.map(({ keys, ...a }) => a) }, null, 2) + '\n');
@@ -298,7 +304,19 @@ function buildGrammar(warnings) {
   return articles;
 }
 
+// 목차 → docs/course.json. 과 번호가 겹치지 않는지 확인한다
+function buildCourse(warnings) {
+  const seen = new Map();
+  for (const lv of CURRICULUM) for (const p of lv.parts) for (const un of p.units) {
+    if (seen.has(un.n)) warnings.push(`목차의 과 번호 ${un.n} ("${un.title}") 이 "${seen.get(un.n)}" 와 겹칩니다`);
+    seen.set(un.n, un.title);
+  }
+  fs.writeFileSync(OUT_COURSE, JSON.stringify({ builtAt: new Date().toISOString(), levels: CURRICULUM }, null, 2) + '\n');
+  console.log(`목차 ${CURRICULUM.length}레벨 ${seen.size}과`);
+}
+
 const warnings = [];
 if (!fs.existsSync(NOTES_DIR)) { console.error('notes/ 폴더가 없습니다'); process.exit(1); }
+buildCourse(warnings);
 buildCards(warnings, buildGrammar(warnings));
 for (const w of warnings) console.warn(`경고: ${w}`);

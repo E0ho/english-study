@@ -5,11 +5,12 @@
   const K_MARKS = 'eng-marks';        // { cardId: { fav: true, wrong: { 예문: true }, hist: { r, w } } }
   const K_SETTINGS = 'eng-settings';
   const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
-  const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+  const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} if (k === K_MARKS || k === 'eng-days') syncSoon(); };
 
   const TYPES = ['단어', '표현', '패턴'];
   let data = { cards: [] };
   let grammar = { articles: [] };
+  let course = { levels: [] };     // 목차: 레벨 → 부 → 과 (scripts/curriculum.js)
   let marks = load(K_MARKS, {});
   let settings = Object.assign({ mode: 'card' }, load(K_SETTINGS, {}));
 
@@ -32,7 +33,29 @@
     headphones: svg('M4.5 16v-3.5a7.5 7.5 0 0 1 15 0V16M4.5 15h2.5v5H5.5a1 1 0 0 1-1-1zM19.5 15H17v5h1.5a1 1 0 0 0 1-1z'),
     play: svg('M8 5.5v13l10.5-6.5z', 'fillable'),
     pause: svg('M8.5 5.5v13M15.5 5.5v13'),
+    down: svg('M7 10l5 5 5-5'),
+    chev: svg('M10 6.5l5.5 5.5-5.5 5.5'),
+    book: svg('M12 6.5C10 5 7 4.6 4 5v13.5c3-.4 6 0 8 1.5 2-1.5 5-1.9 8-1.5V5c-3-.4-6 0-8 1.5zM12 6.5V20'),
+    pen: svg('M5 19l1-4L16.5 4.5l3 3L9 18zM14.5 6.5l3 3'),
   };
+  // ───────── 학습한 날 (홈의 연속 학습일과 이번 주) ─────────
+  const K_DAYS = 'eng-days';          // { 'YYYY-MM-DD': { sets: 오늘의 학습 완료 수, quiz: 시험 완료 수, n: 푼 문제, r: 맞힌 문제 } }
+  let days = load(K_DAYS, {});
+  const pad = (n) => String(n).padStart(2, '0');
+  const dayKey = (d = new Date()) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const daysAgo = (n) => { const d = new Date(); d.setDate(d.getDate() - n); return d; };
+  function logDay(fn) {
+    const k = dayKey();
+    const d = days[k] || { sets: 0, quiz: 0, n: 0, r: 0 };
+    fn(d); days[k] = d; save(K_DAYS, days);
+  }
+  const studied = (d) => { const x = days[dayKey(d)]; return !!(x && (x.sets || x.quiz)); };
+  // 연속 학습일. 오늘 아직 안 했으면 어제까지 이어진 날 수
+  function streak() {
+    let n = 0, i = studied(new Date()) ? 0 : 1;
+    while (studied(daysAgo(i))) { n++; i++; }
+    return n;
+  }
   const isMarked = (c, key) => !!(marks[c.id] && marks[c.id][key]);
   function setMark(c, key, on) {
     const m = marks[c.id] || {};
@@ -59,14 +82,51 @@
     const m = marks[c.id] || {};
     const h = m.hist || { r: 0, w: 0 };
     if (ok) h.r += 1; else h.w += 1;
-    m.hist = h; marks[c.id] = m; save(K_MARKS, marks);
+    m.hist = h; m.last = dayKey(); marks[c.id] = m; save(K_MARKS, marks);
+    logDay(d => { d.n += 1; if (ok) d.r += 1; });
   }
-  // 필터: all | wrong | fav | 단어 | 표현 | 패턴 | u3 (교재 3과)
+  // 배운 카드: 오늘의 학습에서 소개받았거나(seen) 시험에 한 번이라도 나온 카드
+  const isSeen = (c) => !!(marks[c.id] && (marks[c.id].seen || marks[c.id].hist));
+  function markSeen(c) {
+    const m = marks[c.id] || {};
+    if (m.seen) return;
+    m.seen = dayKey(); marks[c.id] = m; save(K_MARKS, marks);
+  }
+  // 필터: all | wrong | fav | 단어 | 표현 | 패턴 | u3 (교재 3과) | self (교재 밖에서 직접 정리한 카드)
   const unitOf = (f) => /^u\d+$/.test(f) ? Number(f.slice(1)) : null;
-  const pool = (f) => data.cards.filter(c => f === 'all' ? true : f === 'wrong' ? isWrong(c) : f === 'fav' ? isMarked(c, f) : unitOf(f) != null ? c.unit === unitOf(f) : c.category === f);
-  const filterLabel = (f) => f === 'all' ? '전체' : f === 'wrong' ? '오답노트' : f === 'fav' ? '즐겨찾기' : unitOf(f) != null ? `${unitOf(f)}과` : f;
+  const pool = (f) => data.cards.filter(c => f === 'all' ? true : f === 'wrong' ? isWrong(c) : f === 'fav' ? isMarked(c, f) : f === 'self' ? c.unit == null : unitOf(f) != null ? c.unit === unitOf(f) : c.category === f);
+  const filterLabel = (f) => f === 'all' ? '전체' : f === 'wrong' ? '오답노트' : f === 'fav' ? '즐겨찾기' : f === 'self' ? '직접 정리한 카드' : unitOf(f) != null ? `${unitOf(f)}과` : f;
   const unitKeys = () => [...new Set(data.cards.map(c => c.unit).filter(u => u != null))].sort((a, b) => a - b).map(u => `u${u}`);
-  const filterKeys = () => ['all', 'wrong', 'fav', ...TYPES.filter(t => pool(t).length), ...unitKeys()];
+  // 목차의 모든 과를 순서대로. 각 과에 level, part 를 붙인다
+  const allUnits = () => course.levels.flatMap(lv => lv.parts.flatMap(p => p.units.map(x => ({ ...x, level: lv.level, part: p.name }))));
+  const unitInfo = (u) => allUnits().find(x => x.n === u);
+  const unitTitle = (u) => {
+    const info = unitInfo(u);
+    if (info) return info.title;
+    const a = grammar.articles.find(x => x.unit === u);
+    if (a) return a.title;
+    const c = data.cards.find(x => x.unit === u);
+    return c ? c.title.replace(/^교재\s*\d+과\s*/, '') : `${u}과`;
+  };
+  const scopeName = (f) => unitOf(f) != null ? `${unitOf(f)}과 · ${unitTitle(unitOf(f))}` : filterLabel(f);
+  // 범위 고르기: 칩 줄 대신 버튼 하나. 누르면 아래에서 묶음별 목록이 올라온다
+  const scopeBtn = (id, f, n, unit = '') => `<button type="button" class="scope" id="${id}"><span>${esc(scopeName(f))}</span><b>${n}${unit}</b>${ICON.down}</button>`;
+  function openScope(cur, count, pick) {
+    const row = (k) => `<button type="button" class="sh-row${k === cur ? ' on' : ''}" data-f="${k}"><span>${esc(scopeName(k))}</span><b>${count(k)}</b>${k === cur ? ICON.check : '<i></i>'}</button>`;
+    const groups = [['', ['all', 'wrong', 'fav']], ['종류', TYPES.filter(t => pool(t).length)],
+      ['교재', [...unitKeys(), ...(pool('self').length && unitKeys().length ? ['self'] : [])]]];
+    openSheet(`<h3>범위</h3>${groups.filter(g => g[1].length).map(([t, ks]) => `${t ? `<div class="sh-g">${t}</div>` : ''}${ks.map(row).join('')}`).join('')}`,
+      (sh, close) => sh.querySelectorAll('.sh-row').forEach(b => b.onclick = () => { close(); pick(b.dataset.f); }));
+  }
+  function openSheet(html, wire) {
+    const bg = document.createElement('div');
+    bg.className = 'sheet-bg';
+    bg.innerHTML = `<div class="sheet" role="dialog">${html}</div>`;
+    const close = () => bg.remove();
+    bg.onclick = (e) => { if (e.target === bg) close(); };
+    document.body.appendChild(bg);
+    wire(bg.querySelector('.sheet'), close);
+  }
   const favBtn = (c, cls) => `<button class="${cls} ${isMarked(c, 'fav') ? 'on' : ''}" aria-label="즐겨찾기" aria-pressed="${isMarked(c, 'fav')}">${ICON.star}</button>`;
   // 별 버튼: 누르면 즐겨찾기를 켜고 끈다. after 는 바뀐 뒤 화면을 맞추는 콜백
   function wireFav(b, c, after) {
@@ -174,7 +234,7 @@
           <button class="icon-btn" id="open-stats" aria-label="기록·설정">${ICON.chart}</button>
         </div>
       </header>
-      <div class="subbar"><div class="chips" id="filters"></div><div id="sub-right"></div></div>
+      <div class="subbar"><div id="filters"></div><div id="sub-right"></div></div>
       <div id="cards-main"></div>`;
     $('#open-stats').onclick = () => showView('stats');
     if ($('#open-listen')) $('#open-listen').onclick = () => showView('listen');
@@ -184,16 +244,10 @@
     renderFilters();
     if (mode === 'card') renderStudy(); else renderList();
   }
+  // 범위 버튼 하나. 누르면 범위 목록이 아래에서 올라온다
   function renderFilters() {
-    $('#filters').innerHTML = filterKeys().map(k =>
-      `<button data-f="${k}" class="${k === filter ? 'active' : ''}">${filterLabel(k)} ${pool(k).length}</button>`).join('');
-    $('#filters').querySelectorAll('button').forEach(b => b.onclick = () => { filter = b.dataset.f; renderCards(); });
-    showActiveChip($('#filters'));
-  }
-  // 가로로 넘치는 칩 줄에서 고른 칩이 보이게 한다 (문법 문서에서 "이 과 카드"로 왔을 때)
-  function showActiveChip(row) {
-    const a = row.querySelector('.active');
-    if (a) row.scrollLeft = a.offsetLeft - (row.clientWidth - a.offsetWidth) / 2;
+    $('#filters').innerHTML = scopeBtn('f-scope', filter, pool(filter).length, '장');
+    $('#f-scope').onclick = () => openScope(filter, k => pool(k).length, (k) => { filter = k; renderCards(); });
   }
   const emptyText = () => filter === 'wrong' ? '오답노트가 비어 있어요' : filter === 'fav' ? '즐겨찾기한 카드가 없어요' : '아직 카드가 없어요';
   const emptyHint = () => filter === 'wrong' ? '시험에서 틀린 문제가 자동으로 들어오고, 다시 맞히면 빠집니다.' : filter === 'fav' ? '카드 오른쪽 위의 별을 누르면 추가됩니다.' : '공부한 내용을 정리해서 올리면 여기에 나타납니다.';
@@ -386,7 +440,7 @@
     $('#listen-body').innerHTML = `
       <header class="topbar"><button class="back" id="l-back">← 카드로 돌아가기</button></header>
       <header class="topbar"><h1>듣기</h1><div class="right" id="l-count"></div></header>
-      <div class="chips" id="l-filters">${filterKeys().map(k => `<button data-f="${k}" class="${k === filter ? 'active' : ''}">${filterLabel(k)} ${pool(k).length}</button>`).join('')}</div>
+      <div class="subbar" id="l-filters"></div>
       <div id="l-main"></div>
       <div class="label">읽는 방식</div>
       <div class="chips wrap" id="l-opts">
@@ -397,11 +451,11 @@
       ${rateChips('l-rate')}
       <p class="muted l-note">화면이 꺼지면 브라우저가 읽기를 멈춰요. 재생 중에는 화면이 켜진 채로 유지돼요.</p>`;
     $('#l-back').onclick = () => selectTab('cards');
-    showActiveChip($('#l-filters'));
-    $('#l-filters').querySelectorAll('button').forEach(b => b.onclick = () => listenGo(() => {
-      filter = b.dataset.f; listen.step = 0;
-      $('#l-filters').querySelectorAll('button').forEach(x => x.classList.toggle('active', x === b));
-    }));
+    const paintScope = () => {
+      $('#l-filters').innerHTML = scopeBtn('l-scope', filter, pool(filter).length, '장');
+      $('#l-scope').onclick = () => openScope(filter, k => pool(k).length, (k) => listenGo(() => { filter = k; listen.step = 0; paintScope(); }));
+    };
+    paintScope();
     $('#l-opts').querySelectorAll('button').forEach(b => b.onclick = () => listenGo(() => {
       const k = b.dataset.o;
       settings[k] = k === 'listenKo' ? settings.listenKo === false : !settings[k];
@@ -439,13 +493,22 @@
     $('#l-play').onclick = () => { if (listen.on) { stopListen(); paintListen(); } else startListen(); };
   }
 
-  // ───────── 시험 (예문 빈칸 채우기) ─────────
+  // ───────── 연습 (문제 풀기) ─────────
+  // 문제마다 방식이 다를 수 있다. 오늘의 학습은 소개 → 문장 조립 → 빈칸 → 영작 → 받아쓰기를 섞어서 낸다
   const QUIZ_MAX = 10;
   let quizSource = 'all';
-  const QUIZ_MODES = [['type', '타이핑'], ['choice', '보기 4개'], ['order', '문장 배열'], ...(TTS ? [['listen', '받아쓰기']] : [])];
-  let quizMode = load('quizMode', 'type');
-  if (!QUIZ_MODES.some(([k]) => k === quizMode)) quizMode = 'type';
-  let quiz = null;                 // { mode, items: [{ card, ex }], idx, results: [{ ok, given }], answered }
+  const MODES = {
+    intro: ['새 표현', '표현을 먼저 보고, 발음을 들어 보세요.'],
+    order: ['문장 조립', '해석을 보고 단어를 순서대로 눌러 문장을 완성하세요.'],
+    type: ['빈칸 채우기', '예문의 빈칸에 들어갈 말을 맞혀 보세요. 해석에서 강조된 부분이 빈칸의 뜻입니다. 원형이나 작은 오타도 정답으로 봅니다.'],
+    choice: ['보기 고르기', '예문의 빈칸에 들어갈 말을 보기에서 고르세요.'],
+    write: ['영작', '해석을 보고 영어 문장 전체를 써 보세요. 대소문자와 문장부호는 안 봐요. 작은 오타는 정답으로 봅니다.'],
+    listen: ['받아쓰기', '문장을 듣고 빈칸에 들린 말을 그대로 써 보세요. 작은 오타는 정답으로 봅니다. 소리를 켜 주세요.'],
+  };
+  const QUIZ_MODES = ['order', 'write', 'type', 'choice', ...(TTS ? ['listen'] : [])];
+  let quizMode = load('quizMode', 'order');
+  if (!QUIZ_MODES.includes(quizMode)) quizMode = 'order';
+  let quiz = null;                 // { items: [{ card, ex, mode }], idx, results: [{ ok, v, given }], answered, daily, title }
   const norm = (s) => s.toLowerCase().replace(/['’‘`]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();   // Im = I'm
   function editDistance(a, b) {
     let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
@@ -456,7 +519,7 @@
     }
     return prev[b.length];
   }
-  const tolerance = (len) => len <= 5 ? 0 : len <= 10 ? 1 : 2;   // 허용하는 오타 글자 수
+  const tolerance = (len) => len <= 5 ? 0 : len <= 10 ? 1 : len <= 24 ? 2 : Math.floor(len / 12);   // 허용하는 오타 글자 수
   // 답을 정답들과 비교해 exact | base | near | wrong 을 돌려준다
   function judge(given, answers) {
     const g = norm(given);
@@ -469,8 +532,8 @@
   const quizItems = (f) => pool(f).flatMap(c => (c.examples || []).filter(ex => ex.mark && ex.en.includes(ex.mark) && (f !== 'wrong' || isWrongEx(c, ex))).map(ex => ({ card: c, ex })));
   const baseForm = (c) => c.front.replace(/~/g, ' ');   // 카드 앞면의 원형. 패턴은 ~ 를 뺀 고정 부분
   const startQuiz = () => {
-    const items = pickWeighted(quizItems(quizSource), QUIZ_MAX);   // 오답노트를 다 맞혀 비었으면 시작 화면으로
-    quiz = items.length ? { mode: quizMode, items, idx: 0, results: [], answered: false } : null;
+    const items = pickWeighted(quizItems(quizSource), QUIZ_MAX).map(it => ({ ...it, mode: quizMode }));   // 오답노트를 다 맞혀 비었으면 시작 화면으로
+    quiz = items.length ? { items, idx: 0, results: [], answered: false, title: `${MODES[quizMode][0]} · ${scopeName(quizSource)}` } : null;
     renderQuiz();
   };
   // 많이 틀린 카드(틀림 2배 - 맞힘, 오답노트 +3)에 가중치를 줘서 n개를 뽑는다
@@ -506,39 +569,100 @@
     return shuffle(opts);
   }
 
+  // ───────── 오늘의 학습 ─────────
+  // 지금 공부할 과: 아직 안 본 카드가 남은 첫 과. 다 봤으면 정답 기록이 가장 적은 과
+  const unitCards = (u) => pool(`u${u}`);
+  const unitSeen = (u) => unitCards(u).filter(isSeen).length;
+  const mastered = (c) => hist(c).r >= 2 && hist(c).r > hist(c).w;
+  const unitDone = (u) => unitCards(u).length > 0 && unitCards(u).every(mastered);
+  function currentUnit() {
+    const units = unitKeys().map(unitOf);   // 카드가 있는 과만, 번호순
+    if (!units.length) return null;
+    return units.find(u => unitSeen(u) < unitCards(u).length) ?? units.find(u => !unitDone(u)) ?? units[units.length - 1];
+  }
+  const DAILY_NEW = 3;
+  const randomEx = (c) => c.examples[Math.random() * c.examples.length | 0];
+  const okEx = (c) => (c.examples || []).filter(ex => ex.mark && ex.en.includes(ex.mark));
+  // 오늘의 학습 한 세트: 새 표현 소개 → 새 표현으로 문장 조립 → 오답·복습 빈칸 → 복습 영작 → 받아쓰기
+  function dailyItems() {
+    const u = currentUnit();
+    const fresh = (u != null ? unitCards(u) : data.cards).filter(c => !isSeen(c) && okEx(c).length).slice(0, DAILY_NEW);
+    const old = shuffle(data.cards.filter(c => isSeen(c) && okEx(c).length && !fresh.includes(c)));
+    const items = [];
+    fresh.forEach(c => items.push({ card: c, ex: okEx(c)[0], mode: 'intro' }));
+    fresh.forEach(c => items.push({ card: c, ex: okEx(c)[0], mode: 'order' }));
+    const wrong = shuffle(quizItems('wrong')).slice(0, 3);
+    wrong.forEach(it => items.push({ ...it, mode: 'type' }));
+    const used = new Set([...fresh, ...wrong.map(it => it.card)]);
+    const take = (n, mode, from) => { for (const c of from) { if (used.has(c)) continue; used.add(c); items.push({ card: c, ex: shuffle(okEx(c))[0], mode }); if (--n <= 0) break; } };
+    // 복습은 최근에 안 본 카드부터
+    const stale = old.sort((a, b) => ((marks[a.id] || {}).last || '').localeCompare((marks[b.id] || {}).last || ''));
+    take(Math.max(1, 3 - wrong.length), 'type', stale);
+    take(2, 'write', stale);
+    if (TTS) take(2, 'listen', stale);
+    // 배운 게 아직 적으면 새 표현으로 한 번 더 연습한다
+    if (old.length < 3) fresh.forEach(c => { const ex = okEx(c)[1] || okEx(c)[0]; items.push({ card: c, ex, mode: 'type' }); if (TTS) items.push({ card: c, ex: okEx(c)[0], mode: 'listen' }); });
+    return { unit: u, fresh, items };
+  }
+  function startDaily() {
+    const d = dailyItems();
+    if (!d.items.length) return toast('공부할 카드가 없어요');
+    quiz = { items: d.items, idx: 0, results: [], answered: false, daily: true, title: d.unit != null ? `${d.unit}과 · ${unitTitle(d.unit)}` : '오늘의 학습' };
+    selectTab('quiz', false, true);
+    renderQuiz();
+  }
+
   function renderQuiz() {
     if (!quiz) return renderQuizStart();
     if (quiz.idx >= quiz.items.length) return renderQuizResult();
     renderQuizQuestion();
   }
   function renderQuizStart() {
-    const sources = filterKeys().filter(k => unitOf(k) == null);
-    const units = unitKeys();
-    const chip = (k) => `<button data-f="${k}" class="${k === quizSource ? 'active' : ''}">${filterLabel(k)} ${quizItems(k).length}</button>`;
     const n = quizItems(quizSource).length;
     $('#quiz-body').innerHTML = `
-      <header class="topbar"><h1>시험</h1></header>
-      <p class="lead">${quizMode === 'order' ? '해석을 보고 단어를 순서대로 눌러 문장을 완성하세요.' : quizMode === 'listen' ? '문장을 듣고 빈칸에 들린 말을 그대로 써 보세요. 작은 오타는 정답으로 봅니다. 소리를 켜 주세요.' : `예문의 빈칸에 들어갈 말을 맞혀 보세요. 해석에서 강조된 부분이 빈칸의 뜻입니다.${quizMode === 'type' ? ' 원형이나 작은 오타도 정답으로 봅니다.' : ''}`}</p>
-      <div class="label">범위</div>
-      <div class="chips wrap" id="q-src">${sources.map(chip).join('')}</div>
-      ${units.length ? `<div class="label">교재</div><div class="chips wrap" id="q-unit">${units.map(chip).join('')}</div>` : ''}
+      <header class="topbar"><h1>연습</h1></header>
       <div class="label">방식</div>
-      <div class="chips wrap" id="q-mode">${QUIZ_MODES.map(([k, t]) => `<button data-m="${k}" class="${k === quizMode ? 'active' : ''}">${t}</button>`).join('')}</div>
+      <div class="chips wrap" id="q-mode">${QUIZ_MODES.map(k => `<button data-m="${k}" class="${k === quizMode ? 'active' : ''}">${MODES[k][0]}</button>`).join('')}</div>
+      <p class="lead">${MODES[quizMode][1]}</p>
+      <div class="label">범위</div>
+      <div class="subbar">${scopeBtn('q-scope', quizSource, n, '문제')}</div>
       <div class="q-start">
         <div class="big">${Math.min(n, QUIZ_MAX)}<small>문제</small></div>
         <div class="muted">${n > QUIZ_MAX ? `${n}개 중에서 ${QUIZ_MAX}개를 뽑아요` : n ? '고른 범위의 예문 전부' : '이 범위에는 낼 문제가 없어요'}</div>
         <button class="cta" id="q-go" ${n ? '' : 'disabled'}>시작</button>
       </div>`;
-    $('#quiz-body').querySelectorAll('#q-src button, #q-unit button').forEach(b => b.onclick = () => { quizSource = b.dataset.f; renderQuizStart(); });
+    $('#q-scope').onclick = () => openScope(quizSource, k => quizItems(k).length, (k) => { quizSource = k; renderQuizStart(); });
     $('#q-mode').querySelectorAll('button').forEach(b => b.onclick = () => { quizMode = b.dataset.m; save('quizMode', quizMode); renderQuizStart(); });
     $('#q-go').onclick = startQuiz;
   }
+  const quizHead = () => `
+      <header class="topbar"><button class="back" id="q-quit">${quiz.daily ? '그만하기' : '그만하기'}</button><div class="right">${quiz.idx + 1} / ${quiz.items.length}</div></header>
+      <div class="progress"><div style="width:${quiz.idx / quiz.items.length * 100}%"></div></div>`;
+  const wireQuit = () => { $('#q-quit').onclick = () => { const d = quiz.daily; quiz = null; if (d) selectTab('home'); else renderQuiz(); }; };
   // 문장 배열: 해석만 보여 주고, 섞인 단어를 눌러 예문 전체를 순서대로 만든다
   // 대화 예문의 화자 표시(A: B:)와 문장부호는 뺀다
   function orderTokens(ex) {
     const t = ex.en.trim().split(/\s+/).filter(x => !/^[A-Z]:$/.test(x)).map(x => x.replace(/^["“(]+|[.,!?;:"”)]+$/g, '')).filter(Boolean);
     if (t.length && !/^I\b/.test(t[0])) t[0] = t[0][0].toLowerCase() + t[0].slice(1);   // 첫 단어가 대문자로 드러나지 않게
     return t;
+  }
+  // 새 표현 소개: 앞면, 뜻, 예문을 보여 주고 발음을 들려준다
+  function renderIntro() {
+    const { card: c } = quiz.items[quiz.idx];
+    markSeen(c);
+    quiz.answered = true;
+    $('#quiz-body').innerHTML = `${quizHead()}
+      <div class="q-card">${favBtn(c, 'star')}
+        <div class="type">새 표현 · ${esc(c.category)}</div>
+        <div class="q-front">${esc(c.front)}${sayBtn(c.front)}</div>
+        <div class="q-meaning">${esc(c.meaning)}</div>
+        <div class="label">예문</div>${examplesHtml(c)}
+        ${c.note ? `<div class="label">메모</div><div class="note">${esc(c.note)}</div>` : ''}
+      </div>
+      <button class="cta block" id="q-next">알겠어요</button>`;
+    wireQuit(); wireFav($('#quiz-body .star'), c); wireGrammarLinks($('#quiz-body'), 'quiz');
+    if (TTS) say(c.front);
+    $('#q-next').onclick = () => { quiz.results.push({ intro: true }); quiz.idx += 1; renderQuiz(); window.scrollTo(0, 0); };
   }
   function renderOrderQuestion() {
     const { card: c, ex } = quiz.items[quiz.idx];
@@ -547,13 +671,12 @@
     if (words.length > 1 && bank.every((v, i) => v === i)) bank.push(bank.shift());
     const picked = [];
     quiz.answered = false;
-    $('#quiz-body').innerHTML = `
-      <header class="topbar"><button class="back" id="q-quit">그만하기</button><div class="right">${quiz.idx + 1} / ${quiz.items.length}</div></header>
-      <div class="progress"><div style="width:${quiz.idx / quiz.items.length * 100}%"></div></div>
+    $('#quiz-body').innerHTML = `${quizHead()}
       <div class="q-card">${favBtn(c, 'star')}
-        <div class="type">문장 배열 · 단어 ${words.length}개</div>
+        <div class="type">문장 조립 · 단어 ${words.length}개</div>
         <div class="q-en" id="q-en"></div>
         <div class="q-ko lg">${esc(ex.ko || c.meaning)}</div>
+        ${quiz.daily ? `<div class="q-hint">표현: <mark>${esc(c.front)}</mark></div>` : ''}
       </div>
       <div id="q-answer">
         <div class="o-line" id="o-line"></div>
@@ -567,7 +690,7 @@
       $('#o-bank').querySelectorAll('button').forEach(b => b.onclick = () => { picked.push(+b.dataset.i); paint(); });
     };
     paint();
-    $('#q-quit').onclick = () => { quiz = null; renderQuiz(); };
+    wireQuit();
     $('#q-skip').onclick = () => grade('', true);
     wireFav($('#quiz-body .star'), c);
     $('#o-check').onclick = () => {
@@ -575,22 +698,51 @@
       grade(picked.map(i => words[i]).join(' '));
     };
   }
-  function renderQuizQuestion() {
-    if (quiz.mode === 'order') return renderOrderQuestion();
+  // 영작: 해석을 보고 문장 전체를 쓴다. 힌트로 표현의 원형을 보여 준다
+  function renderWriteQuestion() {
     const { card: c, ex } = quiz.items[quiz.idx];
+    quiz.answered = false;
+    $('#quiz-body').innerHTML = `${quizHead()}
+      <div class="q-card">${favBtn(c, 'star')}
+        <div class="type">영작 · 단어 ${ex.en.trim().split(/\s+/).length}개</div>
+        <div class="q-en" id="q-en"></div>
+        <div class="q-ko lg">${esc(ex.ko || c.meaning)}</div>
+        <div class="q-hint">표현: <mark>${esc(c.front)}</mark></div>
+      </div>
+      <div id="q-answer">
+        <form id="q-form" autocomplete="off">
+          <textarea id="q-input" rows="2" placeholder="영어 문장을 써 보세요" autocapitalize="sentences" autocorrect="off" spellcheck="false" enterkeyhint="done"></textarea>
+          <div class="q-btns"><button type="button" class="ghost" id="q-skip">정답 보기</button><button type="submit" class="cta">확인</button></div>
+        </form>
+      </div>`;
+    wireQuit();
+    $('#q-skip').onclick = () => grade('', true);
+    wireFav($('#quiz-body .star'), c);
+    $('#q-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); $('#q-form').requestSubmit(); } });
+    $('#q-form').onsubmit = (e) => {
+      e.preventDefault();
+      const v = $('#q-input').value;
+      if (!v.trim()) { $('#q-input').classList.add('shake'); setTimeout(() => $('#q-input') && $('#q-input').classList.remove('shake'), 300); return; }
+      grade(v);
+    };
+  }
+  function renderQuizQuestion() {
+    const it = quiz.items[quiz.idx];
+    if (it.mode === 'intro') return renderIntro();
+    if (it.mode === 'order') return renderOrderQuestion();
+    if (it.mode === 'write') return renderWriteQuestion();
+    const { card: c, ex } = it;
     const words = ex.mark.trim().split(/\s+/).length;
     const blank = `<span class="blank">${Array.from({ length: words }, () => '<i></i>').join('')}</span>`;
     quiz.answered = false;
-    const opts = quiz.mode === 'choice' ? quizOptions(c, ex) : [];
+    const opts = it.mode === 'choice' ? quizOptions(c, ex) : [];
     const choice = opts.length > 1;   // 보기를 만들 카드가 모자라면 타이핑으로 낸다
-    const dict = quiz.mode === 'listen';
+    const dict = it.mode === 'listen';
     const koHtml = `<div class="q-ko">${withMark(ex.ko || c.meaning, ex.koMark, t => `<mark>${esc(t)}</mark>`)}</div>
         ${ex.koMark ? '' : `<div class="q-hint">뜻: <mark>${esc(c.meaning)}</mark></div>`}`;
-    $('#quiz-body').innerHTML = `
-      <header class="topbar"><button class="back" id="q-quit">그만하기</button><div class="right">${quiz.idx + 1} / ${quiz.items.length}</div></header>
-      <div class="progress"><div style="width:${quiz.idx / quiz.items.length * 100}%"></div></div>
+    $('#quiz-body').innerHTML = `${quizHead()}
       <div class="q-card">${favBtn(c, 'star')}
-        <div class="type">${dict ? '받아쓰기' : esc(c.category)} · 단어 ${words}개</div>
+        <div class="type">${dict ? '받아쓰기' : `빈칸 채우기 · ${esc(c.category)}`} · 단어 ${words}개</div>
         <div class="q-en" id="q-en">${withMark(ex.en, ex.mark, () => blank)}</div>
         ${dict ? `<div class="q-listen">
           <button type="button" class="ghost" id="q-play">${ICON.sound}다시 듣기</button>
@@ -606,7 +758,7 @@
           <div class="q-btns"><button type="button" class="ghost" id="q-skip">정답 보기</button><button type="submit" class="cta">확인</button></div>
         </form>`}
       </div>`;
-    $('#q-quit').onclick = () => { quiz = null; renderQuiz(); };
+    wireQuit();
     $('#q-skip').onclick = () => grade('', true);
     wireFav($('#quiz-body .star'), c);
     if (dict) {
@@ -627,10 +779,13 @@
   function grade(given, reveal) {
     if (quiz.answered) return;
     quiz.answered = true;
-    const { card: c, ex } = quiz.items[quiz.idx];
-    const order = quiz.mode === 'order';   // 문장 배열은 문장 전체가 같아야 정답
-    const answers = quiz.mode === 'listen' ? [ex.mark] : [ex.mark, baseForm(c)];   // 받아쓰기는 들린 형태 그대로만
-    const v = reveal ? 'reveal' : order ? (norm(given) === norm(orderTokens(ex).join(' ')) ? 'exact' : 'wrong') : judge(given, answers);
+    const { card: c, ex, mode } = quiz.items[quiz.idx];
+    const whole = mode === 'order' || mode === 'write';   // 문장 전체가 답
+    const answers = mode === 'listen' ? [ex.mark] : [ex.mark, baseForm(c)];   // 받아쓰기는 들린 형태 그대로만
+    const v = reveal ? 'reveal'
+      : mode === 'order' ? (norm(given) === norm(orderTokens(ex).join(' ')) ? 'exact' : 'wrong')
+      : mode === 'write' ? judge(given, [ex.en])
+      : judge(given, answers);
     const ok = v === 'exact' || v === 'base' || v === 'near';   // 원형이나 오타 1~2개도 정답
     quiz.results.push({ ok, v, given });
     const wasWrong = isWrongEx(c, ex);
@@ -640,11 +795,12 @@
     const HEAD = { exact: '맞았어요', base: '원형으로 맞았어요', near: '거의 맞았어요', wrong: '아쉬워요', reveal: '정답이에요' };
     $('#q-en').innerHTML = withMark(ex.en, ex.mark, t => `<mark class="${ok ? 'ok' : 'no'}">${esc(t)}</mark>`) + sayBtn(ex.en);
     if ($('#q-ko-box')) { $('#q-ko-box').hidden = false; $('.q-listen').remove(); }
+    if (TTS && whole && !reveal) say(ex.en);   // 완성한 문장을 들려준다
     $('#q-answer').innerHTML = `
       <div class="q-result ${ok ? 'ok' : 'no'}">
         <div class="head">${ok ? ICON.check : ICON.x}<b>${HEAD[v]}</b></div>
         ${v === 'wrong' || v === 'near' ? `<div class="given ${v}">내 답: ${esc(given)}</div>` : ''}
-        ${v === 'exact' || order ? '' : `<div class="used">이 문장에서는 <b>${esc(ex.mark)}</b></div>`}
+        ${v === 'exact' || whole ? '' : `<div class="used">이 문장에서는 <b>${esc(ex.mark)}</b></div>`}
         <div class="ans"><b>${esc(c.front)}</b> ${esc(c.meaning)}</div>
         ${ex.grammar.length ? `<div class="gram">${ex.grammar.map(g => g.articleId
           ? `<a class="g-row" href="#g/${g.articleId}"><b>${esc(g.name)}</b>${esc(g.desc)}</a>`
@@ -657,30 +813,176 @@
     $('#q-next').focus({ preventScroll: true });
   }
   function renderQuizResult() {
-    const total = quiz.items.length;
-    const right = quiz.results.filter(r => r.ok).length;
-    const wrong = quiz.items.filter((_, i) => !quiz.results[i].ok);
-    const nReveal = quiz.results.filter(r => r.v === 'reveal').length, nWrong = wrong.length - nReveal;
+    const graded = quiz.items.map((it, i) => ({ it, r: quiz.results[i] })).filter(x => x.r && !x.r.intro);
+    const total = graded.length;
+    const right = graded.filter(x => x.r.ok).length;
+    const wrong = graded.filter(x => !x.r.ok);
+    const nReveal = wrong.filter(x => x.r.v === 'reveal').length, nWrong = wrong.length - nReveal;
+    const fresh = quiz.items.filter(it => it.mode === 'intro').map(it => it.card);
+    if (!quiz.logged) { quiz.logged = true; logDay(d => { if (quiz.daily) d.sets += 1; else d.quiz += 1; }); }
+    const st = streak();
     $('#quiz-body').innerHTML = `
-      <header class="topbar"><h1>결과</h1></header>
+      <header class="topbar"><h1>${quiz.daily ? '오늘의 학습 완료' : '결과'}</h1></header>
       <div class="q-start">
         <div class="big">${right}<small>/ ${total}</small></div>
         <div class="muted">${right === total ? '전부 맞았어요' : [nWrong && `틀림 ${nWrong}`, nReveal && `정답 봄 ${nReveal}`].filter(Boolean).join(' · ')}</div>
+        ${quiz.daily ? `<div class="streak-big">🔥 ${st}일 연속</div>` : ''}
       </div>
-      ${wrong.length ? `<div class="label">놓친 문제</div>${wrong.map((w, i) => `
+      ${fresh.length ? `<div class="label">오늘 새로 배운 표현</div>${fresh.map(c => `
+        <div class="item"><div class="row static"><div class="txt"><div class="front">${esc(c.front)}</div><div class="sum">${esc(c.meaning)}</div></div></div></div>`).join('')}` : ''}
+      ${wrong.length ? `<div class="label">놓친 문제</div>${wrong.map(({ it, r }) => `
         <div class="item"><div class="row static"><div class="txt">
-          <div class="front">${esc(w.card.front)}<span class="tag">${quiz.results[quiz.items.indexOf(w)].v === 'reveal' ? '정답 봄' : '틀림'}</span></div>
-          <div class="sum wrap">${withMark(w.ex.en, w.ex.mark, t => `<mark>${esc(t)}</mark>`)}</div>
+          <div class="front">${esc(it.card.front)}<span class="tag">${r.v === 'reveal' ? '정답 봄' : '틀림'}</span></div>
+          <div class="sum wrap">${withMark(it.ex.en, it.ex.mark, t => `<mark>${esc(t)}</mark>`)}</div>
         </div></div></div>`).join('')}
         <div class="muted center">놓친 문제는 오답노트에 들어 있어요. 다시 맞히면 빠집니다.</div>` : ''}
-      <button class="cta block" id="q-again">다시 풀기</button>
-      <button class="btn" id="q-home">범위 다시 고르기</button>`;
-    $('#q-again').onclick = startQuiz;
-    $('#q-home').onclick = () => { quiz = null; renderQuiz(); };
+      ${quiz.daily ? `<button class="cta block" id="q-home">홈으로</button><button class="btn" id="q-again">한 세트 더</button>`
+        : `<button class="cta block" id="q-again">다시 풀기</button><button class="btn" id="q-home">범위 다시 고르기</button>`}`;
+    $('#q-again').onclick = quiz.daily ? startDaily : startQuiz;
+    $('#q-home').onclick = () => { const d = quiz.daily; quiz = null; if (d) selectTab('home'); else renderQuiz(); };
+  }
+
+  // ───────── 홈 ─────────
+  const KIND = { grammar: '문법 + 패턴', speak: '말하기 과제', situation: '상황 회화' };
+  const LEVEL_CLS = ['', 'lv1', 'lv2', 'lv3', 'lv4'];
+  // 과에 자료가 있나: 카드가 있거나 문법 문서가 있으면 공부할 수 있다
+  const unitReady = (un) => unitCards(un).length > 0 || grammar.articles.some(a => a.unit === un);
+  const unitState = (un) => unitDone(un) ? 'done' : unitSeen(un) ? 'now' : unitReady(un) ? 'ready' : 'soon';
+  const levelOf = (un) => (unitInfo(un) || {}).level || 1;
+  const levelInfo = (lv) => course.levels.find(l => l.level === lv) || course.levels[0];
+  const greet = () => { const h = new Date().getHours(); return h < 5 ? '늦은 밤이에요' : h < 11 ? '좋은 아침이에요' : h < 17 ? '좋은 오후예요' : '좋은 저녁이에요'; };
+  const unitRow = (un, cur) => {
+    const info = unitInfo(un) || {};
+    const cs = unitCards(un), seen = unitSeen(un), st = unitState(un);
+    const pct = cs.length ? Math.round(cs.filter(mastered).length / cs.length * 100) : 0;
+    const sub = st === 'done' ? '완료' : st === 'now' ? `${seen}/${cs.length} 배움 · 익힘 ${pct}%` : st === 'ready' ? `${cs.length ? `표현 ${cs.length}개` : '문법 문서'} · 시작 전` : `${KIND[info.kind] || ''} · 준비 중`;
+    return `<button type="button" class="u-row ${st}${un === cur ? ' cur' : ''}" data-u="${un}">
+      <div class="u-num">${st === 'done' ? ICON.check : un}</div>
+      <div class="u-txt"><div class="u-title">${esc(unitTitle(un))}</div><div class="u-sub">${sub}</div>
+        ${st === 'now' ? `<div class="u-bar"><div style="width:${pct}%"></div></div>` : ''}</div>
+      ${ICON.chev}</button>`;
+  };
+  const wireUnitRows = (root) => root.querySelectorAll('.u-row[data-u]').forEach(b => b.onclick = () => openUnit(Number(b.dataset.u)));
+  // 레벨 진행: 그 레벨의 과 가운데 완료한 과 수 / 전체 과 수
+  function levelProgress(lv) {
+    const us = levelInfo(lv).parts.flatMap(p => p.units.map(x => x.n));
+    return { done: us.filter(unitDone).length, started: us.filter(u => unitSeen(u) > 0).length, ready: us.filter(unitReady).length, total: us.length };
+  }
+  const ring = (pct, size = 64) => {
+    const r = (size - 8) / 2, c = 2 * Math.PI * r;
+    return `<svg class="ring" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}"><circle cx="${size / 2}" cy="${size / 2}" r="${r}"/><circle cx="${size / 2}" cy="${size / 2}" r="${r}" class="fg" stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - pct / 100)}"/></svg>`;
+  };
+  function renderHome() {
+    const today = days[dayKey()] || { sets: 0, quiz: 0, n: 0, r: 0 };
+    const st = streak();
+    const u = currentUnit();
+    const lv = u != null ? levelOf(u) : 1;
+    const L = levelInfo(lv);
+    const week = Array.from({ length: 7 }, (_, i) => daysAgo(6 - i));
+    const d = dailyItems();
+    const nNew = d.fresh.length, nRev = d.items.length - nNew * 2;
+    const prog = levelProgress(lv);
+    const pct = Math.round(prog.done / prog.total * 100);
+    // 지금 과와 그다음 두 과
+    const flat = allUnits().map(x => x.n);
+    const from = u != null ? flat.indexOf(u) : 0;
+    const next = flat.slice(from, from + 3);
+    const seenAll = data.cards.filter(isSeen).length;
+    const now = new Date();
+    $('#home-body').innerHTML = `
+      <header class="topbar home-top">
+        <div><div class="date">${now.getMonth() + 1}월 ${now.getDate()}일 ${'일월화수목금토'[now.getDay()]}요일</div><h1>${greet()}</h1></div>
+        <div class="right">${st ? `<span class="streak">🔥 ${st}일</span>` : ''}<button class="icon-btn" id="open-stats" aria-label="기록·설정">${ICON.chart}</button></div>
+      </header>
+      <div class="week">${week.map(w => `<div class="${studied(w) ? 'on' : ''}${dayKey(w) === dayKey() ? ' today' : ''}"><span>${'일월화수목금토'[w.getDay()]}</span><i>${studied(w) ? ICON.check : ''}</i></div>`).join('')}</div>
+      <section class="hero ${LEVEL_CLS[lv]}${today.sets ? ' done' : ''}">
+        <div class="hero-top"><span class="pill">레벨 ${lv} ${esc(L.name)} · ${esc(L.goal)}</span>${u != null ? `<span>${u}과</span>` : ''}</div>
+        <div class="hero-kicker">${today.sets ? '오늘 학습 완료' : '오늘의 학습'}</div>
+        <h2>${today.sets ? `${today.sets}세트 · ${today.n}문제 풀었어요` : u != null ? esc(unitTitle(u)) : '복습'}</h2>
+        <p>${nNew ? `새 표현 ${nNew}개 + 복습 ${nRev}문제` : `복습 ${d.items.length}문제`} · 약 ${Math.max(3, Math.round(d.items.length * 0.8))}분</p>
+        <button class="cta block" id="h-start">${today.sets ? '한 세트 더' : '시작하기'}</button>
+      </section>
+      <div class="label">빠른 연습</div>
+      <div class="tiles">
+        <button type="button" data-m="order"><i class="t1">${ICON.pen}</i><span>문장 조립</span></button>
+        <button type="button" data-m="write"><i class="t2">${ICON.pen}</i><span>영작</span></button>
+        ${TTS ? `<button type="button" data-m="listen"><i class="t3">${ICON.sound}</i><span>받아쓰기</span></button>` : ''}
+        ${TTS ? `<button type="button" data-m="hear"><i class="t4">${ICON.headphones}</i><span>듣기 모드</span></button>` : ''}
+        <button type="button" data-m="wrong"><i class="t5">${ICON.x}</i><span>오답노트 ${pool('wrong').length}</span></button>
+        <button type="button" data-m="cards"><i class="t6">${ICON.card}</i><span>카드 ${seenAll}/${data.cards.length}</span></button>
+      </div>
+      <div class="label row"><span>코스</span><button type="button" class="link" id="h-course">전체 보기 ${ICON.chev}</button></div>
+      <section class="lv-card ${LEVEL_CLS[lv]}">
+        ${ring(pct)}
+        <div class="lv-txt"><div class="lv-name">레벨 ${lv} · ${esc(L.name)}</div><div class="lv-goal">${esc(L.desc)}</div>
+          <div class="lv-sub">${prog.done}/${prog.total}과 완료 · ${esc(L.months)}</div></div>
+      </section>
+      <div class="u-list">${next.map(un => unitRow(un, u)).join('')}</div>
+      ${pool('self').length ? `<div class="label">직접 정리한 카드</div><button type="button" class="u-row ready" id="h-self"><div class="u-num">${ICON.book}</div><div class="u-txt"><div class="u-title">유튜브에서 정리한 표현</div><div class="u-sub">${pool('self').length}장</div></div>${ICON.chev}</button>` : ''}`;
+    $('#open-stats').onclick = () => showView('stats');
+    $('#h-start').onclick = startDaily;
+    $('#h-course').onclick = () => selectTab('course');
+    $('#home-body').querySelectorAll('.tiles button').forEach(b => b.onclick = () => {
+      const m = b.dataset.m;
+      if (m === 'hear') { filter = u != null ? `u${u}` : 'all'; return showView('listen'); }
+      if (m === 'cards') { filter = 'all'; return selectTab('cards'); }
+      if (m === 'wrong') { if (!pool('wrong').length) return toast('오답노트가 비어 있어요'); quizSource = 'wrong'; quizMode = 'type'; }
+      else { quizSource = u != null && unitSeen(u) ? `u${u}` : 'all'; quizMode = m; }
+      save('quizMode', quizMode); quiz = null;
+      selectTab('quiz', false, true); startQuiz();
+    });
+    wireUnitRows($('#home-body'));
+    if ($('#h-self')) $('#h-self').onclick = () => { filter = 'self'; selectTab('cards'); };
+  }
+
+  // ───────── 코스 (레벨 → 부 → 과) ─────────
+  let courseLevel = null;
+  function renderCourse() {
+    const u = currentUnit();
+    if (courseLevel == null) courseLevel = u != null ? levelOf(u) : 1;
+    const L = levelInfo(courseLevel);
+    const prog = levelProgress(courseLevel);
+    $('#course-body').innerHTML = `
+      <header class="topbar"><h1>코스</h1><div class="right"><span>${allUnits().length}과 · 3년</span></div></header>
+      <div class="seg" id="c-seg">${course.levels.map(l => `<button data-l="${l.level}" class="${LEVEL_CLS[l.level]}${l.level === courseLevel ? ' active' : ''}"><b>${l.level}</b>${esc(l.name)}</button>`).join('')}</div>
+      <section class="lv-card ${LEVEL_CLS[courseLevel]}">
+        ${ring(Math.round(prog.done / prog.total * 100))}
+        <div class="lv-txt"><div class="lv-name">레벨 ${L.level} · ${esc(L.name)} <span class="goal">${esc(L.goal)}</span></div><div class="lv-goal">${esc(L.desc)}</div>
+          <div class="lv-sub">${prog.done}/${prog.total}과 완료 · 자료 ${prog.ready}과 · ${esc(L.months)}</div></div>
+      </section>
+      ${L.parts.map(p => `<div class="c-part"><span>${esc(p.name)}</span><span>${p.units.filter(x => unitDone(x.n)).length}/${p.units.length}</span></div>
+        <div class="u-list">${p.units.map(x => unitRow(x.n, u)).join('')}</div>`).join('')}
+      <p class="muted c-note">자료가 없는 과는 "준비 중"이에요. 공부하면서 하나씩 채워요.</p>`;
+    $('#c-seg').querySelectorAll('button').forEach(b => b.onclick = () => { courseLevel = Number(b.dataset.l); renderCourse(); window.scrollTo(0, 0); });
+    wireUnitRows($('#course-body'));
+  }
+  // 과 하나: 문법 읽기 / 카드 보기 / 연습 / 듣기. 자료가 없으면 준비 중 안내
+  function openUnit(un) {
+    const info = unitInfo(un) || {};
+    const art = grammar.articles.find(a => a.unit === un);
+    const cs = unitCards(un);
+    const ready = unitReady(un);
+    openSheet(`<div class="sh-g">레벨 ${levelOf(un)} · ${esc(info.part || '')} · ${un}과</div><h3>${esc(unitTitle(un))}</h3>
+      <div class="sh-sub">${ready ? `${unitSeen(un)}/${cs.length} 배움 · 익힘 ${cs.length ? Math.round(cs.filter(mastered).length / cs.length * 100) : 0}%` : `${KIND[info.kind] || ''} · 아직 자료가 없어요`}</div>
+      ${art ? `<button type="button" class="sh-row" data-a="grammar">${ICON.book}<span>${info.kind === 'grammar' ? '문법 읽기' : '설명 읽기'}</span></button>` : ''}
+      ${cs.length ? `<button type="button" class="sh-row" data-a="cards">${ICON.card}<span>표현 카드 ${cs.length}장</span></button>
+      <button type="button" class="sh-row" data-a="order">${ICON.pen}<span>문장 조립 연습</span></button>
+      <button type="button" class="sh-row" data-a="write">${ICON.pen}<span>영작 연습</span></button>
+      ${TTS ? `<button type="button" class="sh-row" data-a="hear">${ICON.headphones}<span>듣기 모드</span></button>` : ''}` : ''}
+      ${!ready ? `<p class="muted">이 과는 아직 준비 중이에요. 앞 과를 공부하는 동안 채워 둘게요.</p>` : ''}`,
+      (sh, close) => sh.querySelectorAll('.sh-row').forEach(b => b.onclick = () => {
+        close();
+        const a = b.dataset.a;
+        if (a === 'grammar') { location.hash = `#g/${art.id}`; return; }
+        if (a === 'cards') { filter = `u${un}`; return selectTab('cards'); }
+        if (a === 'hear') { filter = `u${un}`; return showView('listen'); }
+        quizSource = `u${un}`; quizMode = a; save('quizMode', quizMode); quiz = null;
+        selectTab('quiz', false, true); startQuiz();
+      }));
   }
 
   // ───────── 문법 (개념 문서) ─────────
-  const TAB_NAME = { cards: '카드', quiz: '시험' };
+  const TAB_NAME = { home: '홈', course: '코스', cards: '카드', quiz: '연습' };
   const articleIdFromHash = () => (location.hash.match(/^#g\/(\w+)/) || [])[1];
   // 목록 묶음: 교재 문서는 부별로(빌드가 과 순서로 정렬해 둠), 나머지는 맨 뒤 "그 밖의 문서"
   function grammarGroups() {
@@ -766,11 +1068,13 @@
     const rightAll = data.cards.reduce((a, c) => a + hist(c).r, 0);
     const weak = data.cards.filter(c => hist(c).w > 0).sort((a, b) => hist(b).w - hist(a).w || hist(a).r - hist(b).r).slice(0, 5);
     $('#stats-body').innerHTML = `
-      <header class="topbar"><button class="back" id="s-back">← 카드로 돌아가기</button></header>
+      <header class="topbar"><button class="back" id="s-back">← 홈으로</button></header>
       <header class="topbar"><h1>기록·설정</h1></header>
       <div class="metrics">
-        <div class="metric"><div class="label">전체 카드</div><div class="value">${data.cards.length}</div></div>
-        <div class="metric"><div class="label">문법 문서</div><div class="value">${grammar.articles.length}</div></div>
+        <div class="metric"><div class="label">연속 학습</div><div class="value">${streak()}일</div></div>
+        <div class="metric"><div class="label">학습한 날</div><div class="value">${Object.keys(days).filter(k => studied(new Date(k))).length}</div></div>
+        <div class="metric"><div class="label">배운 카드</div><div class="value">${data.cards.filter(isSeen).length}<small> / ${data.cards.length}</small></div></div>
+        <div class="metric"><div class="label">익힌 카드</div><div class="value">${data.cards.filter(mastered).length}</div></div>
         <div class="metric"><div class="label">오답노트</div><div class="value">${count('wrong')}</div></div>
         <div class="metric"><div class="label">즐겨찾기</div><div class="value">${count('fav')}</div></div>
         <div class="metric"><div class="label">푼 문제</div><div class="value">${solved}</div></div>
@@ -784,6 +1088,7 @@
       </div>
       ${TTS ? `<div class="section"><h3>발음 속도</h3>${rateChips('s-rate')}
         <div class="muted" style="margin-top:8px">카드의 발음 듣기, 듣기 모드, 받아쓰기에 같이 쓰여요.</div></div>` : ''}
+      <div class="section"><h3>동기화</h3><div id="sy-box"></div></div>
       <div class="section"><h3>즐겨찾기·오답노트·시험 기록</h3>
         <button class="btn" id="btn-export">내보내기 (JSON)</button>
         <button class="btn" id="btn-import">가져오기</button>
@@ -791,10 +1096,11 @@
         <button class="btn danger" id="btn-reset">즐겨찾기·오답노트·기록 모두 지우기</button>
         <div class="muted" style="margin-top:10px">데이터 빌드: ${data.builtAt ? data.builtAt.replace('T', ' ').slice(0, 16) : '-'}</div>
       </div>`;
-    $('#s-back').onclick = () => selectTab('cards');
+    $('#s-back').onclick = () => selectTab('home');
+    paintSync();
     if (TTS) wireRate('s-rate', () => say('This is how fast I will read.'));
     $('#btn-export').onclick = () => {
-      const blob = new Blob([JSON.stringify({ marks }, null, 2)], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify({ marks, days }, null, 2)], { type: 'application/json' });
       const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
       a.download = `eng-marks-${new Date().toISOString().slice(0, 10)}.json`; a.click();
       setTimeout(() => URL.revokeObjectURL(a.href), 1000);
@@ -806,19 +1112,137 @@
         const obj = JSON.parse(await f.text());
         if (!obj.marks || typeof obj.marks !== 'object') throw new Error();
         marks = obj.marks; save(K_MARKS, marks);
+        if (obj.days && typeof obj.days === 'object') { days = obj.days; save(K_DAYS, days); }
         toast('가져왔어요'); renderStats();
       } catch { toast('파일 형식이 맞지 않아요'); }
     };
     $('#btn-reset').onclick = () => {
-      if (!confirm('즐겨찾기, 오답노트, 시험 기록을 모두 지울까요? 되돌릴 수 없어요.')) return;
-      marks = {}; save(K_MARKS, marks); toast('지웠어요'); renderStats();
+      if (!confirm('즐겨찾기, 오답노트, 학습 기록을 모두 지울까요? 되돌릴 수 없어요.')) return;
+      marks = {}; days = {}; save(K_MARKS, marks); save(K_DAYS, days); toast('지웠어요'); renderStats();
     };
+  }
+
+  // ───────── 동기화 (Firebase, 무료 플랜) ─────────
+  // 학습 기록(marks, days)을 Firestore 의 users/{uid} 문서 하나에 통째로 둔다. 이메일·비밀번호 로그인.
+  // 폰 저장소가 원본이고, 바뀔 때마다 몇 초 뒤 올린다. 다른 기기에서 바뀌면 받아서 합친다.
+  const SYNC = { ready: false, user: null, timer: null, unsub: null, last: load('eng-sync-at', null), busy: false, err: '' };
+  let fbAuth = null, fbDb = null;
+  const loadScript = (src) => new Promise((ok, no) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = no; document.head.appendChild(s); });
+  async function initSync() {
+    if (!window.FIREBASE_CONFIG) return;
+    try {
+      const v = '10.14.1';
+      await loadScript(`https://www.gstatic.com/firebasejs/${v}/firebase-app-compat.js`);
+      await Promise.all([loadScript(`https://www.gstatic.com/firebasejs/${v}/firebase-auth-compat.js`), loadScript(`https://www.gstatic.com/firebasejs/${v}/firebase-firestore-compat.js`)]);
+      firebase.initializeApp(window.FIREBASE_CONFIG);
+      fbAuth = firebase.auth(); fbDb = firebase.firestore();
+      SYNC.ready = true;
+      fbAuth.onAuthStateChanged(u => { SYNC.user = u; if (u) watchRemote(); else stopWatch(); paintSync(); });
+    } catch (e) { SYNC.err = '동기화 모듈을 불러오지 못했어요 (오프라인?)'; }
+  }
+  const userDoc = () => fbDb.collection('users').doc(SYNC.user.uid);
+  // 두 기기의 기록 합치기: 즐겨찾기는 하나라도 켜져 있으면 켜짐, 오답은 합집합, 횟수는 큰 쪽, 날짜는 이른/늦은 쪽
+  function mergeMarks(a = {}, b = {}) {
+    const out = {};
+    for (const id of new Set([...Object.keys(a), ...Object.keys(b)])) {
+      const x = a[id] || {}, y = b[id] || {}, m = {};
+      if (x.fav || y.fav) m.fav = true;
+      const w = { ...(x.wrong || {}), ...(y.wrong || {}) };
+      if (Object.keys(w).length) m.wrong = w;
+      if (x.hist || y.hist) m.hist = { r: Math.max((x.hist || {}).r || 0, (y.hist || {}).r || 0), w: Math.max((x.hist || {}).w || 0, (y.hist || {}).w || 0) };
+      const seen = [x.seen, y.seen].filter(Boolean).sort()[0]; if (seen) m.seen = seen;
+      const last = [x.last, y.last].filter(Boolean).sort().pop(); if (last) m.last = last;
+      if (Object.keys(m).length) out[id] = m;
+    }
+    return out;
+  }
+  function mergeDays(a = {}, b = {}) {
+    const out = {};
+    for (const k of new Set([...Object.keys(a), ...Object.keys(b)])) {
+      const x = a[k] || {}, y = b[k] || {};
+      out[k] = { sets: Math.max(x.sets || 0, y.sets || 0), quiz: Math.max(x.quiz || 0, y.quiz || 0), n: Math.max(x.n || 0, y.n || 0), r: Math.max(x.r || 0, y.r || 0) };
+    }
+    return out;
+  }
+  // 받은 기록을 폰 기록과 합쳐 저장하고, 화면이 기록을 보여 주는 중이면 다시 그린다
+  function applyRemote(d) {
+    if (!d) return;
+    const m2 = mergeMarks(marks, d.marks), d2 = mergeDays(days, d.days);
+    const changed = JSON.stringify(m2) !== JSON.stringify(marks) || JSON.stringify(d2) !== JSON.stringify(days);
+    marks = m2; days = d2;
+    try { localStorage.setItem(K_MARKS, JSON.stringify(marks)); localStorage.setItem(K_DAYS, JSON.stringify(days)); } catch {}
+    if (changed) {
+      const v = document.querySelector('.view.active');
+      if (v && v.id === 'view-home') renderHome();
+      if (v && v.id === 'view-stats') renderStats();
+      if (v && v.id === 'view-cards' && settings.mode === 'list') fillList();
+    }
+  }
+  function watchRemote() {
+    stopWatch();
+    SYNC.unsub = userDoc().onSnapshot(snap => {
+      if (snap.metadata.hasPendingWrites) return;   // 내가 올린 것
+      const d = snap.data();
+      if (d) { applyRemote(d); SYNC.last = new Date().toISOString(); save('eng-sync-at', SYNC.last); }
+      syncSoon(0);   // 합친 결과를 올려 둔다 (같으면 쓰기 한 번뿐)
+      paintSync();
+    }, () => { SYNC.err = '서버에서 기록을 받지 못했어요'; paintSync(); });
+  }
+  function stopWatch() { if (SYNC.unsub) { SYNC.unsub(); SYNC.unsub = null; } }
+  function syncSoon(ms = 2500) {
+    if (!SYNC.ready || !SYNC.user) return;
+    clearTimeout(SYNC.timer);
+    SYNC.timer = setTimeout(pushNow, ms);
+  }
+  async function pushNow() {
+    if (!SYNC.ready || !SYNC.user || SYNC.busy) return;
+    SYNC.busy = true;
+    try {
+      await userDoc().set({ marks, days, updatedAt: new Date().toISOString(), device: navigator.userAgent.slice(0, 60) }, { merge: false });
+      SYNC.last = new Date().toISOString(); save('eng-sync-at', SYNC.last); SYNC.err = '';
+    } catch (e) { SYNC.err = '올리지 못했어요. 다시 시도해요'; }
+    SYNC.busy = false; paintSync();
+  }
+  const AUTH_MSG = { 'auth/invalid-email': '이메일 형식이 아니에요', 'auth/user-not-found': '없는 계정이에요. 회원가입을 눌러 보세요', 'auth/wrong-password': '비밀번호가 틀렸어요', 'auth/invalid-credential': '이메일이나 비밀번호가 틀렸어요',
+    'auth/email-already-in-use': '이미 가입된 이메일이에요. 로그인을 눌러 보세요', 'auth/weak-password': '비밀번호는 6자 이상이어야 해요', 'auth/network-request-failed': '인터넷 연결을 확인해 주세요', 'auth/too-many-requests': '잠시 뒤에 다시 시도해 주세요' };
+  async function doAuth(signup) {
+    const email = ($('#sy-email').value || '').trim(), pw = $('#sy-pw').value || '';
+    if (!email || !pw) return toast('이메일과 비밀번호를 넣어 주세요');
+    try {
+      if (signup) await fbAuth.createUserWithEmailAndPassword(email, pw); else await fbAuth.signInWithEmailAndPassword(email, pw);
+      toast(signup ? '가입했어요. 기록을 올리는 중' : '로그인했어요');
+    } catch (e) { toast(AUTH_MSG[e.code] || `실패: ${e.code || e.message}`); }
+  }
+  const fmtTime = (iso) => { if (!iso) return '아직 안 함'; const d = new Date(iso); return `${d.getMonth() + 1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+  function syncHtml() {
+    if (!window.FIREBASE_CONFIG) return `<div class="muted">아직 설정 전이에요. <code>docs/firebase-config.js</code>에 Firebase 설정을 넣으면 켜져요 (README 참고).</div>`;
+    if (!SYNC.ready) return `<div class="muted">${esc(SYNC.err || '동기화 모듈을 불러오는 중…')}</div>`;
+    if (!SYNC.user) return `
+      <div class="muted" style="margin-bottom:10px">로그인하면 즐겨찾기·오답노트·학습 기록이 서버에 저장되고, 다른 폰이나 PC에서도 이어서 공부할 수 있어요.</div>
+      <form id="sy-form" autocomplete="on">
+        <input id="sy-email" class="field" type="email" placeholder="이메일" autocomplete="username" inputmode="email">
+        <input id="sy-pw" class="field" type="password" placeholder="비밀번호 (6자 이상)" autocomplete="current-password">
+        <div class="q-btns"><button type="button" class="ghost" id="sy-signup">회원가입</button><button type="submit" class="cta">로그인</button></div>
+      </form>`;
+    return `
+      <div class="sy-row"><span class="muted">계정</span><b>${esc(SYNC.user.email || '')}</b></div>
+      <div class="sy-row"><span class="muted">마지막 동기화</span><b>${SYNC.err ? `<span class="bad">${esc(SYNC.err)}</span>` : fmtTime(SYNC.last)}</b></div>
+      <div class="q-btns" style="margin-top:12px"><button type="button" class="ghost" id="sy-out">로그아웃</button><button type="button" class="cta" id="sy-now" ${SYNC.busy ? 'disabled' : ''}>${SYNC.busy ? '올리는 중…' : '지금 동기화'}</button></div>`;
+  }
+  function paintSync() {
+    const box = $('#sy-box'); if (!box) return;
+    box.innerHTML = syncHtml();
+    if ($('#sy-form')) { $('#sy-form').onsubmit = (e) => { e.preventDefault(); doAuth(false); }; $('#sy-signup').onclick = () => doAuth(true); }
+    if ($('#sy-now')) $('#sy-now').onclick = () => { pushNow(); toast('올리는 중'); };
+    if ($('#sy-out')) $('#sy-out').onclick = () => { if (confirm('로그아웃할까요? 폰의 기록은 그대로 남아요.')) fbAuth.signOut(); };
   }
 
   // ───────── 탭 / 공통 ─────────
   function showView(name) {
     if (name !== 'listen') stopListen();
     document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === `view-${name}`));
+    if (name === 'home') renderHome();
+    if (name === 'course') renderCourse();
     if (name === 'cards') renderCards();
     if (name === 'grammar') renderGrammar();
     if (name === 'stats') renderStats();
@@ -851,12 +1275,15 @@
     try {
       data = await (await fetch('data.json', { cache: 'no-cache' })).json();
     } catch {
-      $('#cards-body').innerHTML = `<div class="done"><h2>데이터를 불러오지 못했어요</h2><p>온라인 상태에서 한 번 열어 두면 이후엔 오프라인에서도 열립니다.</p></div>`;
+      $('#home-body').innerHTML = `<div class="done"><h2>데이터를 불러오지 못했어요</h2><p>온라인 상태에서 한 번 열어 두면 이후엔 오프라인에서도 열립니다.</p></div>`;
       return;
     }
     try { grammar = await (await fetch('grammar.json', { cache: 'no-cache' })).json(); } catch {}
-    selectTab(location.hash.startsWith('#g/') ? 'grammar' : 'cards');
+    try { course = await (await fetch('course.json', { cache: 'no-cache' })).json(); } catch {}
+    selectTab(location.hash.startsWith('#g/') ? 'grammar' : 'home');
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+    if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});   // 브라우저가 오래 안 쓴 사이트 데이터를 지우지 않게
+    initSync();
   }
   init();
 })();
