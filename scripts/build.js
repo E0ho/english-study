@@ -97,6 +97,7 @@ function parseNote(file, text, warnings) {
         source: meta.source || '',
         date: meta.date || '',
         tags: Array.isArray(meta.tags) ? meta.tags : (meta.tags ? [meta.tags] : []),
+        unit: /^\d+$/.test(meta.unit || '') ? Number(meta.unit) : null,   // 교재 과 번호. 앱의 과별 범위
       };
       continue;
     }
@@ -273,11 +274,24 @@ function buildGrammar(warnings) {
       date: meta.date || '',
       source: meta.source || '',
       tags: Array.isArray(meta.tags) ? meta.tags : (meta.tags ? [meta.tags] : []),
+      // 교재 순서. unit = 과 번호, part = 부 이름 (예: 1부 문장의 뼈대). 없으면 교재 밖 문서
+      unit: /^\d+$/.test(meta.unit || '') ? Number(meta.unit) : null,
+      part: meta.part || '',
       keys: [meta.title || '', ...(Array.isArray(meta.keywords) ? meta.keywords : (meta.keywords ? [meta.keywords] : []))].map(norm).filter(Boolean),
       html: mdToHtml(body),
     };
   });
-  articles.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : a.title.localeCompare(b.title)));
+  // 교재 문서는 과 순서대로 앞에, 나머지는 최신순으로 뒤에
+  articles.sort((a, b) =>
+    (a.unit != null || b.unit != null) ? (a.unit ?? Infinity) - (b.unit ?? Infinity)
+      : (a.date < b.date ? 1 : a.date > b.date ? -1 : a.title.localeCompare(b.title)));
+  const units = new Map();
+  for (const a of articles) {
+    if (a.unit == null) { if (a.part) warnings.push(`"${a.title}" 에 part 만 있고 unit 이 없습니다`); continue; }
+    if (units.has(a.unit)) warnings.push(`"${a.title}" 의 unit ${a.unit} 이 "${units.get(a.unit)}" 와 겹칩니다`);
+    units.set(a.unit, a.title);
+    if (!a.part) warnings.push(`"${a.title}" 에 unit 은 있는데 part 가 없습니다`);
+  }
   fs.mkdirSync(path.dirname(OUT_GRAMMAR), { recursive: true });
   fs.writeFileSync(OUT_GRAMMAR, JSON.stringify({ builtAt: new Date().toISOString(), articles: articles.map(({ keys, ...a }) => a) }, null, 2) + '\n');
   console.log(`문법 문서 ${articles.length}편`);

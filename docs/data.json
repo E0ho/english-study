@@ -1,10 +1,1530 @@
 {
-  "builtAt": "2026-10-13T21:49:28.645Z",
+  "builtAt": "2026-10-27T11:52:14.530Z",
   "categories": [
     "패턴",
     "표현"
   ],
   "cards": [
+    {
+      "id": "80a6076c9d",
+      "category": "패턴",
+      "front": "There's ~",
+      "meaning": "~가 있어",
+      "examples": [
+        {
+          "en": "There's a good cafe near my office.",
+          "mark": "There's",
+          "ko": "우리 회사 근처에 괜찮은 카페가 있어.",
+          "koMark": "있어",
+          "grammar": [
+            {
+              "name": "There is 구문",
+              "desc": "There's + 단수 명사: ~가 있다",
+              "articleId": "fe6a3c90"
+            },
+            {
+              "name": "영어 어순",
+              "desc": "무엇이 → 어디에: 장소는 뒤에 붙인다",
+              "articleId": "fe6a3c90"
+            }
+          ]
+        },
+        {
+          "en": "I think there's something wrong with my phone.",
+          "mark": "there's",
+          "ko": "내 휴대폰에 뭔가 문제가 있는 것 같아.",
+          "koMark": "있는",
+          "grammar": [
+            {
+              "name": "There is 구문",
+              "desc": "there's + something",
+              "articleId": "fe6a3c90"
+            },
+            {
+              "name": "명사절 접속사 that 생략",
+              "desc": "I think 뒤에 that이 빠짐",
+              "articleId": ""
+            }
+          ]
+        }
+      ],
+      "note": "여러 개면 There are ~. 회화에서는 There's 로 퉁치는 경우도 많다.",
+      "title": "교재 1과 영어 어순",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 1,
+      "example": "There's a good cafe near my office. 우리 회사 근처에 괜찮은 카페가 있어.\nI think there's something wrong with my phone. 내 휴대폰에 뭔가 문제가 있는 것 같아."
+    },
+    {
+      "id": "37818c7886",
+      "category": "패턴",
+      "front": "I'm getting ~",
+      "meaning": "점점 ~해지고 있어",
+      "examples": [
+        {
+          "en": "I'm getting hungry. Let's grab something.",
+          "mark": "I'm getting",
+          "ko": "슬슬 배고파지네. 뭐 좀 먹자.",
+          "koMark": "배고파지네",
+          "grammar": [
+            {
+              "name": "2형식 문장",
+              "desc": "get + 형용사: 점점 ~해지다",
+              "articleId": "fe6a3c90"
+            },
+            {
+              "name": "현재진행형",
+              "desc": "am getting: 지금 변하는 중",
+              "articleId": "9d88c6b1"
+            }
+          ]
+        },
+        {
+          "en": "I'm getting better at speaking English.",
+          "mark": "I'm getting",
+          "ko": "영어 말하기가 점점 나아지고 있어.",
+          "koMark": "나아지고 있어",
+          "grammar": [
+            {
+              "name": "2형식 문장",
+              "desc": "get + 비교급 better",
+              "articleId": "fe6a3c90"
+            },
+            {
+              "name": "동명사",
+              "desc": "전치사 at 뒤라서 speaking",
+              "articleId": ""
+            }
+          ]
+        }
+      ],
+      "note": "",
+      "title": "교재 1과 영어 어순",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 1,
+      "example": "I'm getting hungry. Let's grab something. 슬슬 배고파지네. 뭐 좀 먹자.\nI'm getting better at speaking English. 영어 말하기가 점점 나아지고 있어."
+    },
+    {
+      "id": "25293f1c13",
+      "category": "패턴",
+      "front": "Can you give me ~?",
+      "meaning": "~ 좀 줄래? / ~ 좀 해 줄래?",
+      "examples": [
+        {
+          "en": "Can you give me a hand with this box?",
+          "mark": "Can you give me",
+          "ko": "이 상자 좀 도와줄래?",
+          "koMark": "도와줄래",
+          "grammar": [
+            {
+              "name": "4형식 문장",
+              "desc": "give + 사람 + 물건",
+              "articleId": "fe6a3c90"
+            },
+            {
+              "name": "의문문",
+              "desc": "조동사 can이 주어 앞으로",
+              "articleId": "d7a1bf5e"
+            }
+          ]
+        },
+        {
+          "en": "Can you give me a call when you get home?",
+          "mark": "Can you give me",
+          "ko": "집에 도착하면 전화 줄래?",
+          "koMark": "전화 줄래",
+          "grammar": [
+            {
+              "name": "4형식 문장",
+              "desc": "give + me + a call",
+              "articleId": "fe6a3c90"
+            },
+            {
+              "name": "접속사 when",
+              "desc": "when 뒤는 미래라도 현재시제 get",
+              "articleId": ""
+            }
+          ]
+        }
+      ],
+      "note": "give me a hand = 도와줘, give me a call = 전화 줘, give me a minute = 잠깐만",
+      "title": "교재 1과 영어 어순",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 1,
+      "example": "Can you give me a hand with this box? 이 상자 좀 도와줄래?\nCan you give me a call when you get home? 집에 도착하면 전화 줄래?"
+    },
+    {
+      "id": "9a5eaa5e72",
+      "category": "패턴",
+      "front": "I'll send you ~",
+      "meaning": "~ 보내 줄게",
+      "examples": [
+        {
+          "en": "I'll send you the link after the meeting.",
+          "mark": "I'll send you",
+          "ko": "회의 끝나고 링크 보내 줄게.",
+          "koMark": "보내 줄게",
+          "grammar": [
+            {
+              "name": "4형식 문장",
+              "desc": "send + 사람 + 물건",
+              "articleId": "fe6a3c90"
+            },
+            {
+              "name": "미래시제",
+              "desc": "I'll: 지금 바로 정한 약속",
+              "articleId": "9d88c6b1"
+            }
+          ]
+        },
+        {
+          "en": "I'll send you the photos tonight.",
+          "mark": "I'll send you",
+          "ko": "오늘 밤에 사진 보내 줄게.",
+          "koMark": "보내 줄게",
+          "grammar": [
+            {
+              "name": "4형식 문장",
+              "desc": "send + you + the photos",
+              "articleId": "fe6a3c90"
+            },
+            {
+              "name": "영어 어순",
+              "desc": "무엇을 → 언제: 시간은 맨 뒤",
+              "articleId": "fe6a3c90"
+            }
+          ]
+        }
+      ],
+      "note": "",
+      "title": "교재 1과 영어 어순",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 1,
+      "example": "I'll send you the link after the meeting. 회의 끝나고 링크 보내 줄게.\nI'll send you the photos tonight. 오늘 밤에 사진 보내 줄게."
+    },
+    {
+      "id": "67d70ae2e4",
+      "category": "패턴",
+      "front": "It makes me ~",
+      "meaning": "그것 때문에 ~해져 / 그러면 ~한 기분이 들어",
+      "examples": [
+        {
+          "en": "I hate rush hour. It makes me so stressed.",
+          "mark": "It makes me",
+          "ko": "출퇴근 시간 정말 싫어. 너무 스트레스 받아.",
+          "koMark": "스트레스 받아",
+          "grammar": [
+            {
+              "name": "5형식 문장",
+              "desc": "make + 목적어 + 형용사",
+              "articleId": "fe6a3c90"
+            },
+            {
+              "name": "현재시제",
+              "desc": "hate, makes: 늘 그렇다는 사실",
+              "articleId": "9d88c6b1"
+            }
+          ]
+        },
+        {
+          "en": "Honestly, it makes me a little nervous.",
+          "mark": "it makes me",
+          "ko": "솔직히 그거 때문에 좀 긴장돼.",
+          "koMark": "긴장돼",
+          "grammar": [
+            {
+              "name": "5형식 문장",
+              "desc": "make + me + nervous: 나를 긴장하게 만든다",
+              "articleId": "fe6a3c90"
+            },
+            {
+              "name": "영어 어순",
+              "desc": "우리말 \"나는 긴장돼\"도 영어는 그것이 주어",
+              "articleId": "fe6a3c90"
+            }
+          ]
+        }
+      ],
+      "note": "우리말로 \"내가 ~해\"라도 원인을 주어로 세우면 영어다운 문장이 된다.",
+      "title": "교재 1과 영어 어순",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 1,
+      "example": "I hate rush hour. It makes me so stressed. 출퇴근 시간 정말 싫어. 너무 스트레스 받아.\nHonestly, it makes me a little nervous. 솔직히 그거 때문에 좀 긴장돼."
+    },
+    {
+      "id": "a1e356bc51",
+      "category": "패턴",
+      "front": "It takes ~ to ~",
+      "meaning": "~하는 데 (시간이) 걸려",
+      "examples": [
+        {
+          "en": "It takes about an hour to get there by bus.",
+          "mark": "It takes",
+          "ko": "버스로 거기 가는 데 한 시간쯤 걸려.",
+          "koMark": "걸려",
+          "grammar": [
+            {
+              "name": "비인칭 it",
+              "desc": "걸리는 시간을 말할 때 주어 자리를 채움",
+              "articleId": "fe6a3c90"
+            },
+            {
+              "name": "to부정사 명사적 용법",
+              "desc": "to get there가 진짜 주어",
+              "articleId": "5da1f024"
+            }
+          ]
+        },
+        {
+          "en": "How long does it take to get to work?",
+          "mark": "it take",
+          "ko": "출근하는 데 얼마나 걸려?",
+          "koMark": "걸려",
+          "grammar": [
+            {
+              "name": "의문사 의문문",
+              "desc": "How long + does + 주어 + 동사",
+              "articleId": "d7a1bf5e"
+            },
+            {
+              "name": "비인칭 it",
+              "desc": "",
+              "articleId": "fe6a3c90"
+            }
+          ]
+        }
+      ],
+      "note": "",
+      "title": "교재 1과 영어 어순",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 1,
+      "example": "It takes about an hour to get there by bus. 버스로 거기 가는 데 한 시간쯤 걸려.\nHow long does it take to get to work? 출근하는 데 얼마나 걸려?"
+    },
+    {
+      "id": "38de0c689e",
+      "category": "패턴",
+      "front": "I'm not sure ~",
+      "meaning": "~인지 잘 모르겠어",
+      "examples": [
+        {
+          "en": "I'm not sure if he's coming tonight.",
+          "mark": "I'm not sure",
+          "ko": "그가 오늘 밤에 올지 잘 모르겠어.",
+          "koMark": "잘 모르겠어",
+          "grammar": [
+            {
+              "name": "be동사",
+              "desc": "sure는 형용사라서 am not",
+              "articleId": "ddcd3a3d"
+            },
+            {
+              "name": "간접의문문",
+              "desc": "if + 주어 + 동사 어순",
+              "articleId": "d7a1bf5e"
+            }
+          ]
+        },
+        {
+          "en": "I'm not sure what to say.",
+          "mark": "I'm not sure",
+          "ko": "뭐라고 해야 할지 잘 모르겠어.",
+          "koMark": "잘 모르겠어",
+          "grammar": [
+            {
+              "name": "be동사",
+              "desc": "I'm not + 형용사",
+              "articleId": "ddcd3a3d"
+            },
+            {
+              "name": "to부정사 명사적 용법",
+              "desc": "what to say: 무엇을 말할지",
+              "articleId": "5da1f024"
+            }
+          ]
+        }
+      ],
+      "note": "I don't sure (X). sure는 형용사라서 be동사로 부정한다.",
+      "title": "교재 2과 be동사 vs 일반동사",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 2,
+      "example": "I'm not sure if he's coming tonight. 그가 오늘 밤에 올지 잘 모르겠어.\nI'm not sure what to say. 뭐라고 해야 할지 잘 모르겠어."
+    },
+    {
+      "id": "004ac9f3fd",
+      "category": "패턴",
+      "front": "I don't really ~",
+      "meaning": "별로 ~ 안 해",
+      "examples": [
+        {
+          "en": "I don't really drink coffee.",
+          "mark": "I don't really",
+          "ko": "나 커피 별로 안 마셔.",
+          "koMark": "별로 안",
+          "grammar": [
+            {
+              "name": "일반동사",
+              "desc": "don't + 동사원형으로 부정",
+              "articleId": "ddcd3a3d"
+            },
+            {
+              "name": "현재시제",
+              "desc": "평소 습관",
+              "articleId": "9d88c6b1"
+            }
+          ]
+        },
+        {
+          "en": "I don't really watch TV these days.",
+          "mark": "I don't really",
+          "ko": "요즘은 TV 잘 안 봐.",
+          "koMark": "잘 안",
+          "grammar": [
+            {
+              "name": "일반동사",
+              "desc": "don't + watch",
+              "articleId": "ddcd3a3d"
+            },
+            {
+              "name": "현재시제",
+              "desc": "these days: 요즘의 습관",
+              "articleId": "9d88c6b1"
+            }
+          ]
+        }
+      ],
+      "note": "I really don't ~ 는 \"정말 안 해\"로 훨씬 강한 부정이다.",
+      "title": "교재 2과 be동사 vs 일반동사",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 2,
+      "example": "I don't really drink coffee. 나 커피 별로 안 마셔.\nI don't really watch TV these days. 요즘은 TV 잘 안 봐."
+    },
+    {
+      "id": "3616a101da",
+      "category": "패턴",
+      "front": "be into ~",
+      "meaning": "~를 좋아하다, ~에 빠져 있다",
+      "examples": [
+        {
+          "en": "Are you into K-dramas?",
+          "mark": "into",
+          "ko": "한국 드라마 좋아해?",
+          "koMark": "좋아해",
+          "grammar": [
+            {
+              "name": "be동사",
+              "desc": "질문할 때 Are가 주어 앞으로",
+              "articleId": "ddcd3a3d"
+            }
+          ]
+        },
+        {
+          "en": "I'm really into hiking these days.",
+          "mark": "into",
+          "ko": "나 요즘 등산에 완전 빠져 있어.",
+          "koMark": "빠져 있어",
+          "grammar": [
+            {
+              "name": "be동사",
+              "desc": "I'm + into: ~에 빠진 상태",
+              "articleId": "ddcd3a3d"
+            },
+            {
+              "name": "동명사",
+              "desc": "전치사 into 뒤라서 hiking",
+              "articleId": ""
+            }
+          ]
+        }
+      ],
+      "note": "대답은 Yes, I'm really into it. / Not really.",
+      "title": "교재 2과 be동사 vs 일반동사",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 2,
+      "example": "Are you into K-dramas? 한국 드라마 좋아해?\nI'm really into hiking these days. 나 요즘 등산에 완전 빠져 있어."
+    },
+    {
+      "id": "f883b8b606",
+      "category": "패턴",
+      "front": "Do you happen to ~?",
+      "meaning": "혹시 ~해?",
+      "examples": [
+        {
+          "en": "Do you happen to know where the station is?",
+          "mark": "Do you happen to",
+          "ko": "혹시 역이 어디인지 아세요?",
+          "koMark": "혹시",
+          "grammar": [
+            {
+              "name": "일반동사",
+              "desc": "질문할 때 Do가 맨 앞",
+              "articleId": "ddcd3a3d"
+            },
+            {
+              "name": "간접의문문",
+              "desc": "where + 주어 + 동사",
+              "articleId": "d7a1bf5e"
+            }
+          ]
+        },
+        {
+          "en": "Do you happen to have a charger?",
+          "mark": "Do you happen to",
+          "ko": "혹시 충전기 있어?",
+          "koMark": "혹시",
+          "grammar": [
+            {
+              "name": "일반동사",
+              "desc": "Do + 주어 + 동사원형 have",
+              "articleId": "ddcd3a3d"
+            },
+            {
+              "name": "to부정사",
+              "desc": "happen to + 동사원형: 마침 ~하다",
+              "articleId": "5da1f024"
+            }
+          ]
+        }
+      ],
+      "note": "낯선 사람에게 부드럽게 물을 때 좋다.",
+      "title": "교재 2과 be동사 vs 일반동사",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 2,
+      "example": "Do you happen to know where the station is? 혹시 역이 어디인지 아세요?\nDo you happen to have a charger? 혹시 충전기 있어?"
+    },
+    {
+      "id": "7cdee4ec91",
+      "category": "패턴",
+      "front": "be good at ~",
+      "meaning": "~를 잘하다",
+      "examples": [
+        {
+          "en": "I'm really good at remembering names.",
+          "mark": "good at",
+          "ko": "나 사람 이름 외우는 거 진짜 잘해.",
+          "koMark": "잘해",
+          "grammar": [
+            {
+              "name": "be동사",
+              "desc": "good은 형용사라서 I'm",
+              "articleId": "ddcd3a3d"
+            },
+            {
+              "name": "동명사",
+              "desc": "전치사 at 뒤라서 remembering",
+              "articleId": ""
+            }
+          ]
+        },
+        {
+          "en": "Are you good at cooking?",
+          "mark": "good at",
+          "ko": "요리 잘해?",
+          "koMark": "잘해",
+          "grammar": [
+            {
+              "name": "be동사",
+              "desc": "질문할 때 Are가 주어 앞으로",
+              "articleId": "ddcd3a3d"
+            },
+            {
+              "name": "동명사",
+              "desc": "at 뒤 cooking",
+              "articleId": ""
+            }
+          ]
+        }
+      ],
+      "note": "못하면 I'm not good at ~, 서툴면 I'm bad at ~.",
+      "title": "교재 2과 be동사 vs 일반동사",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 2,
+      "example": "I'm really good at remembering names. 나 사람 이름 외우는 거 진짜 잘해.\nAre you good at cooking? 요리 잘해?"
+    },
+    {
+      "id": "89dd18456c",
+      "category": "표현",
+      "front": "agree with",
+      "meaning": "~에 동의하다",
+      "examples": [
+        {
+          "en": "I totally agree with you.",
+          "mark": "agree with",
+          "ko": "완전 네 말에 동의해.",
+          "koMark": "동의해",
+          "grammar": [
+            {
+              "name": "일반동사",
+              "desc": "agree는 일반동사라서 be동사 없이 씀",
+              "articleId": "ddcd3a3d"
+            }
+          ]
+        },
+        {
+          "en": "I don't agree with that idea.",
+          "mark": "agree with",
+          "ko": "나는 그 생각에 동의 안 해.",
+          "koMark": "동의 안 해",
+          "grammar": [
+            {
+              "name": "일반동사",
+              "desc": "don't + 동사원형으로 부정",
+              "articleId": "ddcd3a3d"
+            }
+          ]
+        }
+      ],
+      "note": "I'm agree (X). 사람과 의견에는 with, 제안에는 agree to 도 쓴다.",
+      "title": "교재 2과 be동사 vs 일반동사",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 2,
+      "example": "I totally agree with you. 완전 네 말에 동의해.\nI don't agree with that idea. 나는 그 생각에 동의 안 해."
+    },
+    {
+      "id": "89c26e6b9c",
+      "category": "패턴",
+      "front": "I usually ~",
+      "meaning": "나는 보통 ~해",
+      "examples": [
+        {
+          "en": "I usually take the subway to work.",
+          "mark": "I usually",
+          "ko": "나는 보통 지하철로 출근해.",
+          "koMark": "보통",
+          "grammar": [
+            {
+              "name": "현재시제",
+              "desc": "평소 습관",
+              "articleId": "9d88c6b1"
+            },
+            {
+              "name": "영어 어순",
+              "desc": "빈도 부사 usually는 일반동사 앞",
+              "articleId": "fe6a3c90"
+            }
+          ]
+        },
+        {
+          "en": "On weekends, I usually sleep in.",
+          "mark": "I usually",
+          "ko": "주말에는 보통 늦잠 자.",
+          "koMark": "보통",
+          "grammar": [
+            {
+              "name": "현재시제",
+              "desc": "반복되는 일상",
+              "articleId": "9d88c6b1"
+            }
+          ]
+        }
+      ],
+      "note": "be동사와 쓸 때는 뒤에 온다. I'm usually busy.",
+      "title": "교재 3과 시제 한눈에 보기",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 3,
+      "example": "I usually take the subway to work. 나는 보통 지하철로 출근해.\nOn weekends, I usually sleep in. 주말에는 보통 늦잠 자."
+    },
+    {
+      "id": "6983bc7a17",
+      "category": "패턴",
+      "front": "I'm thinking about ~",
+      "meaning": "~할까 생각 중이야",
+      "examples": [
+        {
+          "en": "I'm thinking about changing jobs.",
+          "mark": "I'm thinking about",
+          "ko": "이직할까 생각 중이야.",
+          "koMark": "생각 중이야",
+          "grammar": [
+            {
+              "name": "현재진행형",
+              "desc": "요즘 고민하고 있는 일",
+              "articleId": "9d88c6b1"
+            },
+            {
+              "name": "동명사",
+              "desc": "전치사 about 뒤라서 changing",
+              "articleId": ""
+            }
+          ]
+        },
+        {
+          "en": "I'm thinking about getting a dog.",
+          "mark": "I'm thinking about",
+          "ko": "강아지 키울까 생각 중이야.",
+          "koMark": "생각 중이야",
+          "grammar": [
+            {
+              "name": "현재진행형",
+              "desc": "am thinking",
+              "articleId": "9d88c6b1"
+            },
+            {
+              "name": "동명사",
+              "desc": "about 뒤 getting",
+              "articleId": ""
+            }
+          ]
+        }
+      ],
+      "note": "think 는 \"생각하다(의견)\"일 때는 진행형을 안 쓴다. I think so.",
+      "title": "교재 3과 시제 한눈에 보기",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 3,
+      "example": "I'm thinking about changing jobs. 이직할까 생각 중이야.\nI'm thinking about getting a dog. 강아지 키울까 생각 중이야."
+    },
+    {
+      "id": "a2b99045d0",
+      "category": "패턴",
+      "front": "I used to ~",
+      "meaning": "예전에는 ~했어 (지금은 안 해)",
+      "examples": [
+        {
+          "en": "I used to live in Busan.",
+          "mark": "I used to",
+          "ko": "나 예전에 부산에 살았어.",
+          "koMark": "예전에",
+          "grammar": [
+            {
+              "name": "used to",
+              "desc": "과거의 상태, 지금은 아님",
+              "articleId": "9d88c6b1"
+            }
+          ]
+        },
+        {
+          "en": "I used to play the piano when I was a kid.",
+          "mark": "I used to",
+          "ko": "어렸을 때 피아노를 쳤었어.",
+          "koMark": "쳤었어",
+          "grammar": [
+            {
+              "name": "used to",
+              "desc": "과거에 반복하던 습관",
+              "articleId": "9d88c6b1"
+            },
+            {
+              "name": "접속사 when",
+              "desc": "when + 과거시제",
+              "articleId": ""
+            }
+          ]
+        }
+      ],
+      "note": "부정은 I didn't use to ~, 질문은 Did you use to ~?",
+      "title": "교재 3과 시제 한눈에 보기",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 3,
+      "example": "I used to live in Busan. 나 예전에 부산에 살았어.\nI used to play the piano when I was a kid. 어렸을 때 피아노를 쳤었어."
+    },
+    {
+      "id": "d2f5f6dcdf",
+      "category": "패턴",
+      "front": "I was about to ~",
+      "meaning": "막 ~하려던 참이었어",
+      "examples": [
+        {
+          "en": "I was about to call you.",
+          "mark": "I was about to",
+          "ko": "막 너한테 전화하려던 참이었어.",
+          "koMark": "하려던 참이었어",
+          "grammar": [
+            {
+              "name": "과거진행형",
+              "desc": "was about to: 그때 막 하려던 상태",
+              "articleId": "9d88c6b1"
+            }
+          ]
+        },
+        {
+          "en": "I was about to leave when it started raining.",
+          "mark": "I was about to",
+          "ko": "막 나가려는데 비가 오기 시작했어.",
+          "koMark": "나가려는데",
+          "grammar": [
+            {
+              "name": "접속사 when",
+              "desc": "그 순간 끼어든 일",
+              "articleId": ""
+            },
+            {
+              "name": "과거시제",
+              "desc": "started",
+              "articleId": "9d88c6b1"
+            }
+          ]
+        }
+      ],
+      "note": "지금 막 하려는 참이면 I'm about to ~.",
+      "title": "교재 3과 시제 한눈에 보기",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 3,
+      "example": "I was about to call you. 막 너한테 전화하려던 참이었어.\nI was about to leave when it started raining. 막 나가려는데 비가 오기 시작했어."
+    },
+    {
+      "id": "1b59061a7d",
+      "category": "패턴",
+      "front": "When I was ~",
+      "meaning": "내가 ~였을 때",
+      "examples": [
+        {
+          "en": "When I was a kid, I hated vegetables.",
+          "mark": "When I was",
+          "ko": "어렸을 때 채소를 정말 싫어했어.",
+          "koMark": "을 때",
+          "grammar": [
+            {
+              "name": "접속사 when",
+              "desc": "when + 주어 + 동사",
+              "articleId": ""
+            },
+            {
+              "name": "과거시제",
+              "desc": "끝난 과거의 사실",
+              "articleId": "9d88c6b1"
+            }
+          ]
+        },
+        {
+          "en": "When I was in college, I worked at a cafe.",
+          "mark": "When I was",
+          "ko": "대학교 다닐 때 카페에서 일했어.",
+          "koMark": "때",
+          "grammar": [
+            {
+              "name": "접속사 when",
+              "desc": "",
+              "articleId": ""
+            },
+            {
+              "name": "과거시제",
+              "desc": "worked",
+              "articleId": "9d88c6b1"
+            }
+          ]
+        }
+      ],
+      "note": "",
+      "title": "교재 3과 시제 한눈에 보기",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 3,
+      "example": "When I was a kid, I hated vegetables. 어렸을 때 채소를 정말 싫어했어.\nWhen I was in college, I worked at a cafe. 대학교 다닐 때 카페에서 일했어."
+    },
+    {
+      "id": "05672d71b5",
+      "category": "표현",
+      "front": "I'm on my way",
+      "meaning": "가는 중이야",
+      "examples": [
+        {
+          "en": "I'm on my way. I'll be there in ten minutes.",
+          "mark": "I'm on my way",
+          "ko": "가는 중이야. 10분 뒤에 도착해.",
+          "koMark": "가는 중이야",
+          "grammar": [
+            {
+              "name": "be동사",
+              "desc": "am + 전치사구: 지금의 상태",
+              "articleId": "ddcd3a3d"
+            },
+            {
+              "name": "미래시제",
+              "desc": "I'll be there",
+              "articleId": "9d88c6b1"
+            }
+          ]
+        },
+        {
+          "en": "I'm on my way to work.",
+          "mark": "I'm on my way",
+          "ko": "출근하는 중이야.",
+          "koMark": "하는 중이야",
+          "grammar": [
+            {
+              "name": "be동사",
+              "desc": "on my way + to + 목적지",
+              "articleId": "ddcd3a3d"
+            }
+          ]
+        }
+      ],
+      "note": "home 앞에는 to를 안 쓴다. I'm on my way home.",
+      "title": "교재 3과 시제 한눈에 보기",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 3,
+      "example": "I'm on my way. I'll be there in ten minutes. 가는 중이야. 10분 뒤에 도착해.\nI'm on my way to work. 출근하는 중이야."
+    },
+    {
+      "id": "601531aa16",
+      "category": "패턴",
+      "front": "Have you ever ~?",
+      "meaning": "~해 본 적 있어?",
+      "examples": [
+        {
+          "en": "Have you ever been to Jeju?",
+          "mark": "Have you ever",
+          "ko": "제주도 가 본 적 있어?",
+          "koMark": "본 적 있어",
+          "grammar": [
+            {
+              "name": "현재완료",
+              "desc": "경험: have + been",
+              "articleId": "c4e2b7f2"
+            },
+            {
+              "name": "의문문",
+              "desc": "Have가 주어 앞으로",
+              "articleId": "d7a1bf5e"
+            }
+          ]
+        },
+        {
+          "en": "Have you ever tried Mexican food?",
+          "mark": "Have you ever",
+          "ko": "멕시코 음식 먹어 본 적 있어?",
+          "koMark": "본 적 있어",
+          "grammar": [
+            {
+              "name": "현재완료",
+              "desc": "경험: have + tried",
+              "articleId": "c4e2b7f2"
+            }
+          ]
+        }
+      ],
+      "note": "가 본 적은 been, gone은 \"가 버려서 여기 없다\".",
+      "title": "교재 4과 현재완료",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 4,
+      "example": "Have you ever been to Jeju? 제주도 가 본 적 있어?\nHave you ever tried Mexican food? 멕시코 음식 먹어 본 적 있어?"
+    },
+    {
+      "id": "a8b7e08485",
+      "category": "패턴",
+      "front": "I've never ~",
+      "meaning": "한 번도 ~해 본 적 없어",
+      "examples": [
+        {
+          "en": "I've never heard of it.",
+          "mark": "I've never",
+          "ko": "그런 건 한 번도 들어 본 적 없어.",
+          "koMark": "한 번도",
+          "grammar": [
+            {
+              "name": "현재완료",
+              "desc": "경험의 부정: never + p.p.",
+              "articleId": "c4e2b7f2"
+            }
+          ]
+        },
+        {
+          "en": "I've never been this tired.",
+          "mark": "I've never",
+          "ko": "이렇게 피곤한 건 처음이야.",
+          "koMark": "처음이야",
+          "grammar": [
+            {
+              "name": "현재완료",
+              "desc": "경험: 태어나서 지금까지",
+              "articleId": "c4e2b7f2"
+            },
+            {
+              "name": "2형식 문장",
+              "desc": "been + 형용사 tired",
+              "articleId": "fe6a3c90"
+            }
+          ]
+        }
+      ],
+      "note": "",
+      "title": "교재 4과 현재완료",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 4,
+      "example": "I've never heard of it. 그런 건 한 번도 들어 본 적 없어.\nI've never been this tired. 이렇게 피곤한 건 처음이야."
+    },
+    {
+      "id": "d6b3b7622f",
+      "category": "패턴",
+      "front": "I've been ~ing",
+      "meaning": "(지금까지 쭉) ~하고 있어",
+      "examples": [
+        {
+          "en": "I've been studying English for two years.",
+          "mark": "I've been",
+          "ko": "2년째 영어 공부하고 있어.",
+          "koMark": "하고 있어",
+          "grammar": [
+            {
+              "name": "현재완료진행형",
+              "desc": "have been + -ing: 지금도 계속",
+              "articleId": "c4e2b7f2"
+            },
+            {
+              "name": "전치사 for",
+              "desc": "for + 기간",
+              "articleId": ""
+            }
+          ]
+        },
+        {
+          "en": "I've been waiting for 30 minutes.",
+          "mark": "I've been",
+          "ko": "30분째 기다리고 있어.",
+          "koMark": "기다리고 있어",
+          "grammar": [
+            {
+              "name": "현재완료진행형",
+              "desc": "have been waiting",
+              "articleId": "c4e2b7f2"
+            }
+          ]
+        }
+      ],
+      "note": "패턴 빈칸은 I've been 까지. 뒤에 -ing 동사를 붙인다.",
+      "title": "교재 4과 현재완료",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 4,
+      "example": "I've been studying English for two years. 2년째 영어 공부하고 있어.\nI've been waiting for 30 minutes. 30분째 기다리고 있어."
+    },
+    {
+      "id": "d6ed4e9406",
+      "category": "패턴",
+      "front": "I've just ~",
+      "meaning": "방금 ~했어",
+      "examples": [
+        {
+          "en": "I've just sent you the file.",
+          "mark": "I've just",
+          "ko": "방금 파일 보냈어.",
+          "koMark": "방금",
+          "grammar": [
+            {
+              "name": "현재완료",
+              "desc": "완료: just + p.p.",
+              "articleId": "c4e2b7f2"
+            },
+            {
+              "name": "4형식 문장",
+              "desc": "send + you + the file",
+              "articleId": "fe6a3c90"
+            }
+          ]
+        },
+        {
+          "en": "I've just finished work.",
+          "mark": "I've just",
+          "ko": "방금 일 끝났어.",
+          "koMark": "방금",
+          "grammar": [
+            {
+              "name": "현재완료",
+              "desc": "완료: 막 끝나서 지금 그 상태",
+              "articleId": "c4e2b7f2"
+            }
+          ]
+        }
+      ],
+      "note": "미국 회화에서는 I just sent ~ 처럼 과거시제도 많이 쓴다.",
+      "title": "교재 4과 현재완료",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 4,
+      "example": "I've just sent you the file. 방금 파일 보냈어.\nI've just finished work. 방금 일 끝났어."
+    },
+    {
+      "id": "ee474edcaf",
+      "category": "패턴",
+      "front": "I haven't ~ yet",
+      "meaning": "아직 ~ 안 했어",
+      "examples": [
+        {
+          "en": "I haven't decided yet.",
+          "mark": "I haven't",
+          "ko": "아직 못 정했어.",
+          "koMark": "아직 못",
+          "grammar": [
+            {
+              "name": "현재완료",
+              "desc": "완료의 부정: haven't + p.p. + yet",
+              "articleId": "c4e2b7f2"
+            }
+          ]
+        },
+        {
+          "en": "I haven't had lunch yet.",
+          "mark": "I haven't",
+          "ko": "아직 점심 안 먹었어.",
+          "koMark": "아직",
+          "grammar": [
+            {
+              "name": "현재완료",
+              "desc": "haven't had",
+              "articleId": "c4e2b7f2"
+            }
+          ]
+        }
+      ],
+      "note": "질문은 Have you ~ yet? (벌써 ~했어?)",
+      "title": "교재 4과 현재완료",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 4,
+      "example": "I haven't decided yet. 아직 못 정했어.\nI haven't had lunch yet. 아직 점심 안 먹었어."
+    },
+    {
+      "id": "460fdeb126",
+      "category": "패턴",
+      "front": "How long have you ~?",
+      "meaning": "~한 지 얼마나 됐어?",
+      "examples": [
+        {
+          "en": "How long have you lived here?",
+          "mark": "How long have you",
+          "ko": "여기 산 지 얼마나 됐어?",
+          "koMark": "지 얼마나 됐어",
+          "grammar": [
+            {
+              "name": "현재완료",
+              "desc": "계속: 과거부터 지금까지",
+              "articleId": "c4e2b7f2"
+            },
+            {
+              "name": "의문사 의문문",
+              "desc": "How long + have + 주어 + p.p.",
+              "articleId": "d7a1bf5e"
+            }
+          ]
+        },
+        {
+          "en": "How long have you been working there?",
+          "mark": "How long have you",
+          "ko": "거기서 일한 지 얼마나 됐어?",
+          "koMark": "지 얼마나 됐어",
+          "grammar": [
+            {
+              "name": "현재완료진행형",
+              "desc": "have been working",
+              "articleId": "c4e2b7f2"
+            },
+            {
+              "name": "의문사 의문문",
+              "desc": "How long으로 기간 묻기",
+              "articleId": "d7a1bf5e"
+            }
+          ]
+        }
+      ],
+      "note": "How long do you live here? (X)",
+      "title": "교재 4과 현재완료",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 4,
+      "example": "How long have you lived here? 여기 산 지 얼마나 됐어?\nHow long have you been working there? 거기서 일한 지 얼마나 됐어?"
+    },
+    {
+      "id": "04d6f5cc8d",
+      "category": "패턴",
+      "front": "What do you think of ~?",
+      "meaning": "~ 어떻게 생각해? / ~ 어때?",
+      "examples": [
+        {
+          "en": "What do you think of my new haircut?",
+          "mark": "What do you think of",
+          "ko": "내 새 머리 어때?",
+          "koMark": "어때",
+          "grammar": [
+            {
+              "name": "의문사 의문문",
+              "desc": "What + do + 주어 + 동사",
+              "articleId": "d7a1bf5e"
+            }
+          ]
+        },
+        {
+          "en": "What do you think of this place?",
+          "mark": "What do you think of",
+          "ko": "여기 어떤 것 같아?",
+          "koMark": "어떤 것 같아",
+          "grammar": [
+            {
+              "name": "의문사 의문문",
+              "desc": "What do you think",
+              "articleId": "d7a1bf5e"
+            }
+          ]
+        }
+      ],
+      "note": "How do you think ~? (X). 생각의 \"내용\"을 묻는 거라 What.",
+      "title": "교재 5과 질문 만들기",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 5,
+      "example": "What do you think of my new haircut? 내 새 머리 어때?\nWhat do you think of this place? 여기 어떤 것 같아?"
+    },
+    {
+      "id": "c0a6cb6afe",
+      "category": "패턴",
+      "front": "Do you know where ~?",
+      "meaning": "~가 어디인지 알아?",
+      "examples": [
+        {
+          "en": "Do you know where the restroom is?",
+          "mark": "Do you know where",
+          "ko": "화장실이 어디인지 아세요?",
+          "koMark": "어디인지 아세요",
+          "grammar": [
+            {
+              "name": "간접의문문",
+              "desc": "where + 주어 + 동사: the restroom is",
+              "articleId": "d7a1bf5e"
+            }
+          ]
+        },
+        {
+          "en": "Do you know where I can buy a ticket?",
+          "mark": "Do you know where",
+          "ko": "표를 어디서 살 수 있는지 아세요?",
+          "koMark": "어디서",
+          "grammar": [
+            {
+              "name": "간접의문문",
+              "desc": "where + I + can buy",
+              "articleId": "d7a1bf5e"
+            },
+            {
+              "name": "조동사 can",
+              "desc": "can + 동사원형",
+              "articleId": ""
+            }
+          ]
+        }
+      ],
+      "note": "Do you know where is the restroom? (X)",
+      "title": "교재 5과 질문 만들기",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 5,
+      "example": "Do you know where the restroom is? 화장실이 어디인지 아세요?\nDo you know where I can buy a ticket? 표를 어디서 살 수 있는지 아세요?"
+    },
+    {
+      "id": "d73407e0ea",
+      "category": "패턴",
+      "front": "Could you tell me ~?",
+      "meaning": "~ 알려 주실래요?",
+      "examples": [
+        {
+          "en": "Could you tell me how to get to the station?",
+          "mark": "Could you tell me",
+          "ko": "역에 어떻게 가는지 알려 주실래요?",
+          "koMark": "알려 주실래요",
+          "grammar": [
+            {
+              "name": "4형식 문장",
+              "desc": "tell + me + 알려 줄 내용",
+              "articleId": "fe6a3c90"
+            },
+            {
+              "name": "to부정사 명사적 용법",
+              "desc": "how to get: 어떻게 가는지",
+              "articleId": "5da1f024"
+            }
+          ]
+        },
+        {
+          "en": "Could you tell me what time it starts?",
+          "mark": "Could you tell me",
+          "ko": "몇 시에 시작하는지 알려 주실래요?",
+          "koMark": "알려 주실래요",
+          "grammar": [
+            {
+              "name": "간접의문문",
+              "desc": "what time + it + starts",
+              "articleId": "d7a1bf5e"
+            }
+          ]
+        }
+      ],
+      "note": "Can you 보다 Could you 가 더 정중하다.",
+      "title": "교재 5과 질문 만들기",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 5,
+      "example": "Could you tell me how to get to the station? 역에 어떻게 가는지 알려 주실래요?\nCould you tell me what time it starts? 몇 시에 시작하는지 알려 주실래요?"
+    },
+    {
+      "id": "cc3a6a1860",
+      "category": "패턴",
+      "front": "How often do you ~?",
+      "meaning": "얼마나 자주 ~해?",
+      "examples": [
+        {
+          "en": "How often do you work out?",
+          "mark": "How often do you",
+          "ko": "얼마나 자주 운동해?",
+          "koMark": "얼마나 자주",
+          "grammar": [
+            {
+              "name": "의문사 의문문",
+              "desc": "How often + do + 주어 + 동사",
+              "articleId": "d7a1bf5e"
+            },
+            {
+              "name": "현재시제",
+              "desc": "평소 습관을 물음",
+              "articleId": "9d88c6b1"
+            }
+          ]
+        },
+        {
+          "en": "How often do you eat out?",
+          "mark": "How often do you",
+          "ko": "외식 얼마나 자주 해?",
+          "koMark": "얼마나 자주",
+          "grammar": [
+            {
+              "name": "의문사 의문문",
+              "desc": "How often",
+              "articleId": "d7a1bf5e"
+            }
+          ]
+        }
+      ],
+      "note": "대답은 every day, twice a week, once in a while, almost never.",
+      "title": "교재 5과 질문 만들기",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 5,
+      "example": "How often do you work out? 얼마나 자주 운동해?\nHow often do you eat out? 외식 얼마나 자주 해?"
+    },
+    {
+      "id": "22cbd6f844",
+      "category": "패턴",
+      "front": "What kind of ~?",
+      "meaning": "어떤 종류의 ~?",
+      "examples": [
+        {
+          "en": "What kind of music do you like?",
+          "mark": "What kind of",
+          "ko": "어떤 음악 좋아해?",
+          "koMark": "어떤",
+          "grammar": [
+            {
+              "name": "의문사 의문문",
+              "desc": "What kind of + 명사 + do + 주어 + 동사",
+              "articleId": "d7a1bf5e"
+            }
+          ]
+        },
+        {
+          "en": "What kind of work do you do?",
+          "mark": "What kind of",
+          "ko": "어떤 일 하세요?",
+          "koMark": "어떤",
+          "grammar": [
+            {
+              "name": "의문사 의문문",
+              "desc": "What kind of work",
+              "articleId": "d7a1bf5e"
+            },
+            {
+              "name": "일반동사",
+              "desc": "do가 두 번: 질문의 do와 \"하다\"의 do",
+              "articleId": "ddcd3a3d"
+            }
+          ]
+        }
+      ],
+      "note": "",
+      "title": "교재 5과 질문 만들기",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 5,
+      "example": "What kind of music do you like? 어떤 음악 좋아해?\nWhat kind of work do you do? 어떤 일 하세요?"
+    },
+    {
+      "id": "d205880747",
+      "category": "패턴",
+      "front": "~, right?",
+      "meaning": "~ 맞지?",
+      "examples": [
+        {
+          "en": "You're from Seoul, right?",
+          "mark": "right",
+          "ko": "서울 출신 맞지?",
+          "koMark": "맞지",
+          "grammar": [
+            {
+              "name": "부가의문문",
+              "desc": "평서문 + right?로 확인",
+              "articleId": "d7a1bf5e"
+            }
+          ]
+        },
+        {
+          "en": "We're meeting at six, right?",
+          "mark": "right",
+          "ko": "우리 6시에 만나는 거 맞지?",
+          "koMark": "맞지",
+          "grammar": [
+            {
+              "name": "부가의문문",
+              "desc": "right?",
+              "articleId": "d7a1bf5e"
+            },
+            {
+              "name": "현재진행형",
+              "desc": "are meeting: 정해 둔 가까운 계획",
+              "articleId": "9d88c6b1"
+            }
+          ]
+        }
+      ],
+      "note": "isn't it?, don't you? 같은 부가의문문 대신 쓰기 쉽다.",
+      "title": "교재 5과 질문 만들기",
+      "source": "",
+      "date": "2026-10-26",
+      "tags": [
+        "교재",
+        "1부"
+      ],
+      "unit": 5,
+      "example": "You're from Seoul, right? 서울 출신 맞지?\nWe're meeting at six, right? 우리 6시에 만나는 거 맞지?"
+    },
     {
       "id": "9bd879f519",
       "category": "패턴",
@@ -20,7 +1540,7 @@
             {
               "name": "현재완료",
               "desc": "It has been: 과거부터 지금까지 이어진 기간",
-              "articleId": ""
+              "articleId": "c4e2b7f2"
             },
             {
               "name": "접속사 since",
@@ -38,7 +1558,7 @@
             {
               "name": "현재완료",
               "desc": "It has been",
-              "articleId": ""
+              "articleId": "c4e2b7f2"
             },
             {
               "name": "접속사 since",
@@ -56,6 +1576,7 @@
         "일상회화",
         "예시"
       ],
+      "unit": null,
       "example": "It's been a while since we talked. 우리가 얘기한 지 오래됐네.\nIt's been a while since I last went to the gym. 마지막으로 헬스장에 간 지 오래됐어."
     },
     {
@@ -73,12 +1594,12 @@
             {
               "name": "과거진행형",
               "desc": "was wondering: 현재의 부탁을 과거형으로 말해 더 정중하게",
-              "articleId": ""
+              "articleId": "9d88c6b1"
             },
             {
               "name": "간접의문문",
               "desc": "if + 주어 + 동사 어순",
-              "articleId": ""
+              "articleId": "d7a1bf5e"
             }
           ]
         },
@@ -91,12 +1612,12 @@
             {
               "name": "간접의문문",
               "desc": "if + 주어 + 동사 어순",
-              "articleId": ""
+              "articleId": "d7a1bf5e"
             },
             {
               "name": "4형식 문장",
               "desc": "send + 사람 + 사물",
-              "articleId": ""
+              "articleId": "fe6a3c90"
             }
           ]
         }
@@ -109,6 +1630,7 @@
         "일상회화",
         "예시"
       ],
+      "unit": null,
       "example": "I was wondering if you could help me with this. 혹시 이것 좀 도와주실 수 있을까요?\nI was wondering if you could send me the file by tomorrow. 혹시 내일까지 그 파일을 보내주실 수 있을까요?"
     },
     {
@@ -126,7 +1648,7 @@
             {
               "name": "현재진행형",
               "desc": "am looking",
-              "articleId": ""
+              "articleId": "9d88c6b1"
             },
             {
               "name": "전치사 to + 동명사",
@@ -157,6 +1679,7 @@
         "일상회화",
         "예시"
       ],
+      "unit": null,
       "example": "I'm looking forward to seeing you. 널 만나기를 고대하고 있어.\nWe look forward to your reply. 답장을 기다리겠습니다."
     },
     {
@@ -172,9 +1695,9 @@
           "koMark": "우연히 마주쳤어",
           "grammar": [
             {
-              "name": "단순과거",
+              "name": "과거시제",
               "desc": "ran: run의 불규칙 과거형",
-              "articleId": ""
+              "articleId": "9d88c6b1"
             }
           ]
         },
@@ -187,12 +1710,12 @@
             {
               "name": "간접의문문",
               "desc": "who + 주어 + 동사 어순",
-              "articleId": ""
+              "articleId": "d7a1bf5e"
             },
             {
-              "name": "미래 will",
+              "name": "미래시제",
               "desc": "You'll never guess",
-              "articleId": ""
+              "articleId": "9d88c6b1"
             }
           ]
         }
@@ -205,6 +1728,7 @@
         "일상회화",
         "예시"
       ],
+      "unit": null,
       "example": "I ran into my old teacher at the mall. 쇼핑몰에서 옛 선생님을 우연히 마주쳤어.\nYou'll never guess who I ran into yesterday. 내가 어제 누굴 마주쳤는지 넌 짐작도 못 할 거야."
     },
     {
@@ -227,7 +1751,7 @@
             {
               "name": "간접의문문",
               "desc": "how + 주어 + 동사 어순",
-              "articleId": ""
+              "articleId": "d7a1bf5e"
             }
           ]
         },
@@ -245,7 +1769,7 @@
             {
               "name": "간접의문문",
               "desc": "what이 주어인 경우 what + 동사",
-              "articleId": ""
+              "articleId": "d7a1bf5e"
             }
           ]
         }
@@ -258,6 +1782,7 @@
         "일상회화",
         "예시"
       ],
+      "unit": null,
       "example": "I can't figure out how this app works. 이 앱이 어떻게 작동하는지 모르겠어.\nI'm trying to figure out what went wrong. 뭐가 잘못됐는지 알아내려는 중이야."
     },
     {
@@ -301,6 +1826,7 @@
         "일상회화",
         "예시"
       ],
+      "unit": null,
       "example": "A: Sorry I'm late. B: No worries. A: 늦어서 미안해. B: 괜찮아.\nNo worries, I can do it myself. 괜찮아, 내가 직접 할 수 있어."
     },
     {
@@ -349,6 +1875,7 @@
         "일상회화",
         "예시"
       ],
+      "unit": null,
       "example": "A: Can you send the file? B: I'm on it. A: 파일 보내줄 수 있어? B: 바로 할게.\nDon't worry about the report. I'm on it. 보고서는 걱정하지 마. 내가 하고 있어."
     }
   ]

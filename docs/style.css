@@ -100,14 +100,12 @@ a.g-row b::after { content: " ›"; }
 .back .src { font-size: 12px; color: var(--text-3); margin-top: 22px; }
 .back .src a { color: inherit; }
 
-.actions { display: grid; grid-template-columns: 48px 1.2fr .9fr 1.1fr; gap: 8px; padding: 12px 0 14px; flex: 0 0 auto; }
+.actions { display: grid; grid-template-columns: 48px 1fr; gap: 8px; padding: 12px 0 14px; flex: 0 0 auto; }
 .actions button { height: 52px; border-radius: 16px; border: 0; font-size: 14px; font-weight: 500; cursor: pointer;
   display: flex; align-items: center; justify-content: center; gap: 5px; background: var(--card); color: var(--text-2); white-space: nowrap; padding: 0 6px; }
 .actions button svg { width: 19px; height: 19px; }
 .actions button:active { transform: scale(.97); }
 .actions button:disabled { opacity: .35; }
-.actions .mark.on { background: var(--accent-bg); color: var(--accent); font-weight: 700; }
-.actions .mark.on svg.fillable { fill: currentColor; }
 .actions .primary { background: var(--accent); color: var(--on-accent); font-weight: 700; font-size: 15px; }
 
 /* 빈 화면 */
@@ -144,6 +142,13 @@ a.g-row b::after { content: " ›"; }
 .g-title { font-size: 17px; font-weight: 700; }
 .g-sum { font-size: 14px; color: var(--text-2); margin-top: 4px; line-height: 1.5; }
 .g-meta { font-size: 12px; color: var(--text-3); margin-top: 10px; }
+.g-part { font-size: 13px; font-weight: 700; color: var(--text-2); margin: 22px 4px 8px; }
+.g-part:first-of-type { margin-top: 4px; }
+.g-unit { font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 2px; }
+.u-navs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 8px 0 12px; }
+.u-nav { display: block; text-decoration: none; color: var(--text); background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 12px; font-size: 14px; font-weight: 600; line-height: 1.4; min-width: 0; overflow-wrap: anywhere; }
+.u-nav span { display: block; font-size: 12px; font-weight: 600; color: var(--accent); margin-bottom: 2px; }
+.u-nav.next { text-align: right; }
 button.back { font-size: 14px; font-weight: 600; color: var(--accent); background: none; border: 0; padding: 8px 0; cursor: pointer; }
 .article { padding-bottom: 8px; line-height: 1.75; font-size: 16px; }
 .article h1 { font-size: 26px; font-weight: 700; line-height: 1.3; margin: 0 0 6px; letter-spacing: -.02em; }
@@ -234,6 +239,9 @@ mark { background: var(--accent-bg); color: var(--accent); padding: 0 3px; borde
 .q-result.ok .head { color: #2f6b12; }
 .q-result.no .head { color: var(--bad); }
 .q-result .given { font-size: 14px; color: var(--text-2); margin-top: 8px; text-decoration: line-through; }
+.q-result .given.near { text-decoration: none; }
+.bar-row .name.wide { width: auto; flex: 1; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar-row .n { width: auto; min-width: 28px; }
 .q-result .ans { font-size: 15px; margin-top: 10px; color: var(--text-2); line-height: 1.5; }
 .q-result .ans b { color: var(--text); margin-right: 6px; }
 .q-result .gram { margin-top: 12px; }
@@ -244,3 +252,72 @@ mark { background: var(--accent-bg); color: var(--accent); padding: 0 3px; borde
 }
 .chips.wrap button.active { background: var(--text); }
 .ex mark, .item .sum mark { background: none; padding: 0; }
+.q-opts { display: grid; gap: 8px; }
+.q-opts button { min-height: 54px; padding: 12px 18px; border-radius: 16px; border: 1px solid var(--border); background: var(--card); color: var(--text);
+  font: inherit; font-size: 16px; font-weight: 600; text-align: left; line-height: 1.4; cursor: pointer; }
+.q-opts button:active { border-color: var(--accent); }
+.ghost.block { width: 100%; margin-top: 10px; }
+.q-result .used { font-size: 15px; margin-top: 10px; color: var(--text-2); }
+.q-result .used b { color: var(--accent); margin-left: 4px; }
+.card-wrap { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.q-card { position: relative; }
+.star { position: absolute; top: 10px; right: 10px; z-index: 1; width: 44px; height: 44px; display: grid; place-items: center; border: 0; border-radius: 14px;
+  background: none; color: var(--text-3); cursor: pointer; }
+.star svg { width: 24px; height: 24px; }
+.star:active { background: var(--card-2); }
+.star.on { color: var(--accent); }
+.star.on svg.fillable { fill: currentColor; }
+.card.flipped .type, .card.flipped .front, .q-card .type { padding-right: 40px; }
+.q-result .wn { font-size: 13px; color: var(--text-3); margin-top: 12px; }
+.q-ko.lg { font-size: 19px; font-weight: 600; color: var(--text); margin-top: 12px; word-break: keep-all; }
+.q-en:empty { display: none; }
+.q-en:not(:empty) + .q-ko.lg { font-size: 16px; font-weight: 400; color: var(--text-2); margin-top: 16px; }
+.o-line { min-height: 62px; padding: 10px; border-radius: 16px; border: 2px dashed var(--border); display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; }
+.o-line span { font-size: 14px; color: var(--text-3); padding: 9px 6px; }
+.o-line.shake { border-color: var(--bad); }
+.o-bank { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 14px; }
+.o-line button, .o-bank button { height: 42px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--border); background: var(--card); color: var(--text);
+  font: inherit; font-size: 16px; font-weight: 600; cursor: pointer; }
+.o-line button { background: var(--accent-bg); color: var(--accent); border-color: transparent; }
+.o-bank button:disabled { opacity: .25; }
+.o-bank + .q-btns { margin-top: 16px; }
+.u-study { margin: 4px 0 16px; }
+.u-study .label { margin-top: 8px; }
+
+/* 발음 듣기 */
+.say { display: inline-grid; place-items: center; width: 32px; height: 32px; margin: -4px 0 -6px 4px; vertical-align: middle; border: 0; border-radius: 10px;
+  background: none; color: var(--accent); cursor: pointer; }
+.say svg { width: 19px; height: 19px; }
+.say:active { background: var(--accent-bg); }
+.say.say-txt { width: auto; margin: 0; padding: 0 12px; gap: 6px; display: inline-flex; height: 36px; font-size: 14px; font-weight: 600; background: var(--accent-bg); }
+.front-say { text-align: center; margin-top: 6px; }
+.front-say .say { width: 44px; height: 44px; margin: 0; }
+.front-say .say svg { width: 24px; height: 24px; }
+.card.flipped .front-say { display: none; }
+
+/* 듣기 모드 */
+#l-filters { margin-bottom: 10px; }
+.l-card { padding: 20px; }
+.l-front { font-size: 24px; font-weight: 700; line-height: 1.3; margin-top: 6px; letter-spacing: -.01em; }
+.l-meaning { font-size: 16px; color: var(--accent); font-weight: 600; margin-top: 6px; line-height: 1.5; }
+.l-ex { margin-top: 14px; padding: 8px 10px; border-radius: 12px; }
+.l-ex .en { font-size: 16px; font-weight: 600; line-height: 1.5; }
+.l-ex .ko { font-size: 14px; color: var(--text-2); line-height: 1.5; margin-top: 2px; }
+.l-front.now, .l-meaning.now { color: var(--accent); }
+.l-front, .l-meaning { border-radius: 8px; }
+.l-ex.now { background: var(--accent-bg); }
+.l-ex.now .en { color: var(--accent); }
+.l-ctrl { display: grid; grid-template-columns: 1fr 1.4fr 1fr; gap: 8px; margin: 12px 0 4px; }
+.l-ctrl button { height: 56px; border: 0; border-radius: 16px; background: var(--card); color: var(--text-2); display: grid; place-items: center; cursor: pointer; }
+.l-ctrl .primary { background: var(--accent); color: var(--on-accent); }
+.l-ctrl .primary svg { width: 26px; height: 26px; }
+.l-ctrl svg.fillable { fill: currentColor; }
+.l-note { margin: 16px 0 24px; line-height: 1.6; }
+
+/* 받아쓰기 */
+.q-listen { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.q-listen .ghost { height: 42px; font-size: 14px; background: var(--card-2); border-radius: 12px; }
+.q-listen #q-play { background: var(--accent-bg); color: var(--accent); font-weight: 600; }
+.q-en .say { margin-left: 6px; }
+.section .chips.wrap button { background: var(--card-2); }
+.section .chips.wrap button.active { background: var(--text); }

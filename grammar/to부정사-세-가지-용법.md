@@ -4,6 +4,8 @@ summary: to + 동사원형이 명사, 형용사, 부사처럼 쓰이는 세 가�
 date: 2026-10-13
 tags: [to부정사]
 keywords: [to부정사, to 부정사]
+unit: 10
+part: 3부 문장 늘리기
 ---
 
 ## 핵심 개념
