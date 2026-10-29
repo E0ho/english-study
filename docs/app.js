@@ -37,9 +37,10 @@
     chev: svg('M10 6.5l5.5 5.5-5.5 5.5'),
     book: svg('M12 6.5C10 5 7 4.6 4 5v13.5c3-.4 6 0 8 1.5 2-1.5 5-1.9 8-1.5V5c-3-.4-6 0-8 1.5zM12 6.5V20'),
     pen: svg('M5 19l1-4L16.5 4.5l3 3L9 18zM14.5 6.5l3 3'),
+    moon: svg('M19 14.5A7.5 7.5 0 0 1 9.5 5a7.5 7.5 0 1 0 9.5 9.5z'),
   };
   // ───────── 학습한 날 (홈의 연속 학습일과 이번 주) ─────────
-  const K_DAYS = 'eng-days';          // { 'YYYY-MM-DD': { sets: 오늘의 학습 완료 수, quiz: 시험 완료 수, n: 푼 문제, r: 맞힌 문제 } }
+  const K_DAYS = 'eng-days';          // { 'YYYY-MM-DD': { sets: 오늘의 학습 완료 수, quiz: 시험 완료 수, n: 푼 문제, r: 맞힌 문제, lis: 끝까지 들은 카드 수 } }
   let days = load(K_DAYS, {});
   const pad = (n) => String(n).padStart(2, '0');
   const dayKey = (d = new Date()) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
@@ -49,7 +50,7 @@
     const d = days[k] || { sets: 0, quiz: 0, n: 0, r: 0 };
     fn(d); days[k] = d; save(K_DAYS, days);
   }
-  const studied = (d) => { const x = days[dayKey(d)]; return !!(x && (x.sets || x.quiz)); };
+  const studied = (d) => { const x = days[dayKey(d)]; return !!(x && (x.sets || x.quiz || x.lis)); };
   // 연속 학습일. 오늘 아직 안 했으면 어제까지 이어진 날 수
   function streak() {
     let n = 0, i = studied(new Date()) ? 0 : 1;
@@ -78,8 +79,30 @@
   }
   // 시험 기록: 카드별 맞힌 횟수 r, 틀린 횟수 w
   const hist = (c) => (marks[c.id] && marks[c.id].hist) || { r: 0, w: 0 };
-  function addHist(c, ok) {
+  // 복습 간격: 평가 버튼 없이 채점 결과로 정한다. 복습일에 맞히면 다음 칸(1→3→7→14→30→60일 뒤), 틀리면 처음부터(내일)
+  // marks[id].rv = { b: 칸 0~6, d: 다음 복습일, t: 마지막으로 채점된 날 }. 복습일 전에 맞히면 칸은 그대로다
+  const GAPS = [0, 1, 3, 7, 14, 30, 60];
+  const addDays = (k, n) => { const d = new Date(`${k}T00:00`); d.setDate(d.getDate() + n); return dayKey(d); };
+  function review(c) {
     const m = marks[c.id] || {};
+    if (m.rv) return m.rv;
+    const from = m.last || m.seen;   // 간격이 생기기 전 기록: 마지막으로 본 날 기준으로 잡는다
+    if (!from) return null;
+    const b = mastered(c) ? 2 : 0;
+    return { b, d: addDays(from, GAPS[b] || 1), t: from };
+  }
+  const isDue = (c) => { const r = review(c); return !!r && r.d <= dayKey(); };
+  function schedule(c, ok) {
+    const m = marks[c.id] || {}, today = dayKey();
+    const r = review(c) || { b: 0, d: today, t: '' };
+    if (!ok) m.rv = { b: 0, d: addDays(today, 1), t: today };
+    else if (r.d <= today && r.t !== today) { const b = Math.min(r.b + 1, GAPS.length - 1); m.rv = { b, d: addDays(today, GAPS[b]), t: today }; }
+    else m.rv = r;
+    marks[c.id] = m;
+  }
+  function addHist(c, ok) {
+    schedule(c, ok);
+    const m = marks[c.id];
     const h = m.hist || { r: 0, w: 0 };
     if (ok) h.r += 1; else h.w += 1;
     m.hist = h; m.last = dayKey(); marks[c.id] = m; save(K_MARKS, marks);
@@ -90,12 +113,15 @@
   function markSeen(c) {
     const m = marks[c.id] || {};
     if (m.seen) return;
-    m.seen = dayKey(); marks[c.id] = m; save(K_MARKS, marks);
+    m.seen = dayKey();
+    if (!m.rv) m.rv = { b: 0, d: m.seen, t: '' };   // 소개받은 날 바로 복습일. 그날 처음 맞히면 내일로 간다
+    marks[c.id] = m; save(K_MARKS, marks);
   }
-  // 필터: all | wrong | fav | 단어 | 표현 | 패턴 | u3 (교재 3과) | self (교재 밖에서 직접 정리한 카드)
+  // 필터: all | due (복습일이 된 카드) | recent (최근 7일 배운 카드) | wrong | fav | 단어 | 표현 | 패턴 | u3 (교재 3과) | self (교재 밖에서 직접 정리한 카드)
   const unitOf = (f) => /^u\d+$/.test(f) ? Number(f.slice(1)) : null;
-  const pool = (f) => data.cards.filter(c => f === 'all' ? true : f === 'wrong' ? isWrong(c) : f === 'fav' ? isMarked(c, f) : f === 'self' ? c.unit == null : unitOf(f) != null ? c.unit === unitOf(f) : c.category === f);
-  const filterLabel = (f) => f === 'all' ? '전체' : f === 'wrong' ? '오답노트' : f === 'fav' ? '즐겨찾기' : f === 'self' ? '직접 정리한 카드' : unitOf(f) != null ? `${unitOf(f)}과` : f;
+  const isRecent = (c) => ((marks[c.id] || {}).seen || '') >= dayKey(daysAgo(6));
+  const pool = (f) => data.cards.filter(c => f === 'all' ? true : f === 'due' ? isDue(c) : f === 'recent' ? isRecent(c) : f === 'wrong' ? isWrong(c) : f === 'fav' ? isMarked(c, f) : f === 'self' ? c.unit == null : unitOf(f) != null ? c.unit === unitOf(f) : c.category === f);
+  const filterLabel = (f) => f === 'all' ? '전체' : f === 'due' ? '오늘 복습할 카드' : f === 'recent' ? '최근 7일 배운 카드' : f === 'wrong' ? '오답노트' : f === 'fav' ? '즐겨찾기' : f === 'self' ? '직접 정리한 카드' : unitOf(f) != null ? `${unitOf(f)}과` : f;
   const unitKeys = () => [...new Set(data.cards.map(c => c.unit).filter(u => u != null))].sort((a, b) => a - b).map(u => `u${u}`);
   // 목차의 모든 과를 순서대로. 각 과에 level, part 를 붙인다
   const allUnits = () => course.levels.flatMap(lv => lv.parts.flatMap(p => p.units.map(x => ({ ...x, level: lv.level, part: p.name }))));
@@ -113,7 +139,7 @@
   const scopeBtn = (id, f, n, unit = '') => `<button type="button" class="scope" id="${id}"><span>${esc(scopeName(f))}</span><b>${n}${unit}</b>${ICON.down}</button>`;
   function openScope(cur, count, pick) {
     const row = (k) => `<button type="button" class="sh-row${k === cur ? ' on' : ''}" data-f="${k}"><span>${esc(scopeName(k))}</span><b>${count(k)}</b>${k === cur ? ICON.check : '<i></i>'}</button>`;
-    const groups = [['', ['all', 'wrong', 'fav']], ['종류', TYPES.filter(t => pool(t).length)],
+    const groups = [['', ['all', ...['due', 'recent'].filter(k => pool(k).length), 'wrong', 'fav']], ['종류', TYPES.filter(t => pool(t).length)],
       ['교재', [...unitKeys(), ...(pool('self').length && unitKeys().length ? ['self'] : [])]]];
     openSheet(`<h3>범위</h3>${groups.filter(g => g[1].length).map(([t, ks]) => `${t ? `<div class="sh-g">${t}</div>` : ''}${ks.map(row).join('')}`).join('')}`,
       (sh, close) => sh.querySelectorAll('.sh-row').forEach(b => b.onclick = () => { close(); pick(b.dataset.f); }));
@@ -237,7 +263,7 @@
       <div class="subbar"><div id="filters"></div><div id="sub-right"></div></div>
       <div id="cards-main"></div>`;
     $('#open-stats').onclick = () => showView('stats');
-    if ($('#open-listen')) $('#open-listen').onclick = () => showView('listen');
+    if ($('#open-listen')) $('#open-listen').onclick = () => openListen(filter, 'cards');
     document.querySelectorAll('.iseg button').forEach(b => b.onclick = () => {
       settings.mode = b.dataset.mode; save(K_SETTINGS, settings); renderCards();
     });
@@ -376,8 +402,9 @@
   // ───────── 듣기 모드 ─────────
   // 카드 탭에서 고른 범위를 순서대로 읽어 준다: 앞면 → 뜻 → 예문마다 영어 → 해석 (→ 영어 한 번 더)
   // 화면을 보지 않고 출퇴근길에 듣는 용도. 카드 탭과 같은 순서(session)와 위치를 쓴다
-  const listen = { on: false, step: 0, token: 0, lock: null };
+  const listen = { on: false, step: 0, token: 0, lock: null, until: 0, tmin: 0, ret: 'cards' };
   const wait = (ms) => new Promise(r => setTimeout(r, ms));
+  const TIMERS = [0, 10, 20, 30];   // 몇 분 뒤 멈춤. 0 은 끄기
   function listenSteps(c) {
     const ko = settings.listenKo !== false, twice = !!settings.listenTwice;
     const st = [{ lang: 'en', text: c.front, at: 'front' }];
@@ -404,7 +431,13 @@
       const c = data.cards.find(x => x.id === s.ids[s.idx]);
       const steps = listenSteps(c);
       if (listen.step >= steps.length) {
-        listen.step = 0; s.idx = (s.idx + 1) % s.ids.length;
+        // 한 장을 끝까지 들었다. 들은 날도 학습한 날로 친다 (연속 학습일 유지)
+        logDay(d => { d.lis = (d.lis || 0) + 1; });
+        listen.step = 0;
+        const end = s.idx === s.ids.length - 1;
+        s.idx = (s.idx + 1) % s.ids.length;
+        if (listen.until && Date.now() >= listen.until) { listen.until = 0; stopListen(); toast('타이머가 끝나서 멈췄어요'); return paintListen(); }
+        if (end && settings.listenOnce) { stopListen(); toast('끝까지 들었어요'); return paintListen(); }
         await wait(1000);
         continue;
       }
@@ -436,9 +469,18 @@
     keepAwake(true);
     runListen(listen.token);
   }
+  // 범위 f 를 처음부터 듣는다. from: 돌아갈 화면 (home | cards | course)
+  function openListen(f, from = 'cards', autoplay = false) {
+    filter = f; listen.ret = from; listen.step = 0;
+    if (sessions[f]) sessions[f].idx = 0;
+    showView('listen');
+    if (autoplay && TTS) startListen();
+  }
+  const BACK = { home: '← 홈으로', cards: '← 카드로 돌아가기', course: '← 코스로' };
   function renderListen() {
+    const left = listen.until ? Math.max(1, Math.ceil((listen.until - Date.now()) / 60000)) : 0;
     $('#listen-body').innerHTML = `
-      <header class="topbar"><button class="back" id="l-back">← 카드로 돌아가기</button></header>
+      <header class="topbar"><button class="back" id="l-back">${BACK[listen.ret] || BACK.cards}</button><button class="icon-btn" id="l-dim" aria-label="화면 어둡게">${ICON.moon}</button></header>
       <header class="topbar"><h1>듣기</h1><div class="right" id="l-count"></div></header>
       <div class="subbar" id="l-filters"></div>
       <div id="l-main"></div>
@@ -446,23 +488,54 @@
       <div class="chips wrap" id="l-opts">
         <button data-o="listenKo" class="${settings.listenKo !== false ? 'active' : ''}">한국어 해석도 읽기</button>
         <button data-o="listenTwice" class="${settings.listenTwice ? 'active' : ''}">영어 한 번 더</button>
+        <button data-o="listenOnce" class="${settings.listenOnce ? 'active' : ''}">끝나면 멈춤</button>
       </div>
+      <div class="label">타이머</div>
+      <div class="chips wrap" id="l-timer">${TIMERS.map(t => `<button data-t="${t}" class="${(left ? t === listen.tmin : !t) ? 'active' : ''}">${t ? `${t}분` : '끄기'}</button>`).join('')}</div>
+      <div class="muted l-left" id="l-left">${left ? `${left}분 뒤 멈춰요 (듣던 카드는 끝까지 읽어요)` : ''}</div>
       <div class="label">속도</div>
       ${rateChips('l-rate')}
-      <p class="muted l-note">화면이 꺼지면 브라우저가 읽기를 멈춰요. 재생 중에는 화면이 켜진 채로 유지돼요.</p>`;
-    $('#l-back').onclick = () => selectTab('cards');
+      <p class="muted l-note">화면이 꺼지면 브라우저가 읽기를 멈춰요. 재생 중에는 화면이 켜진 채로 유지돼요. 주머니에 넣을 때는 오른쪽 위 달 버튼으로 화면을 어둡게 해 두세요.</p>`;
+    $('#l-back').onclick = () => selectTab(listen.ret === 'course' ? 'course' : listen.ret === 'home' ? 'home' : 'cards');
+    $('#l-dim').onclick = openDim;
     const paintScope = () => {
       $('#l-filters').innerHTML = scopeBtn('l-scope', filter, pool(filter).length, '장');
       $('#l-scope').onclick = () => openScope(filter, k => pool(k).length, (k) => listenGo(() => { filter = k; listen.step = 0; paintScope(); }));
     };
     paintScope();
-    $('#l-opts').querySelectorAll('button').forEach(b => b.onclick = () => listenGo(() => {
+    $('#l-opts').querySelectorAll('button').forEach(b => b.onclick = () => {
       const k = b.dataset.o;
-      settings[k] = k === 'listenKo' ? settings.listenKo === false : !settings[k];
-      save(K_SETTINGS, settings); listen.step = 0;
-      b.classList.toggle('active', k === 'listenKo' ? settings.listenKo !== false : settings[k]);
-    }));
+      const apply = () => {
+        settings[k] = k === 'listenKo' ? settings.listenKo === false : !settings[k];
+        save(K_SETTINGS, settings);
+        b.classList.toggle('active', k === 'listenKo' ? settings.listenKo !== false : settings[k]);
+      };
+      if (k === 'listenOnce') return apply();   // 읽는 내용이 안 바뀌니 끊지 않는다
+      listenGo(() => { apply(); listen.step = 0; });
+    });
+    $('#l-timer').querySelectorAll('button').forEach(b => b.onclick = () => {
+      const t = Number(b.dataset.t);
+      listen.until = t ? Date.now() + t * 60000 : 0; listen.tmin = t;
+      $('#l-timer').querySelectorAll('button').forEach(x => x.classList.toggle('active', x === b));
+      $('#l-left').textContent = t ? `${t}분 뒤 멈춰요 (듣던 카드는 끝까지 읽어요)` : '';
+    });
     wireRate('l-rate', () => listenGo(() => {}));
+    paintListen();
+  }
+  // 화면 어둡게: 주머니에 넣고 들을 때. 검은 화면에 지금 읽는 표현만 흐리게 보이고, 두 번 톡 치면 재생·일시정지
+  function openDim() {
+    if ($('#dim')) return;
+    const el = document.createElement('div');
+    el.id = 'dim';
+    el.innerHTML = `<button type="button" class="dim-close">밝게</button><div class="dim-txt" id="dim-txt"></div><div class="dim-hint">두 번 톡: 재생 · 일시정지</div>`;
+    let lastTap = 0;
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('.dim-close')) { el.remove(); return; }
+      const now = Date.now();
+      if (now - lastTap < 350) { lastTap = 0; if (listen.on) { stopListen(); paintListen(); } else startListen(); }
+      else lastTap = now;
+    });
+    document.body.appendChild(el);
     paintListen();
   }
   function paintListen() {
@@ -470,10 +543,11 @@
     if (!main) return;
     const s = session();
     $('#l-count').textContent = s.ids.length ? `${s.idx + 1} / ${s.ids.length}` : '';
-    if (!s.ids.length) { main.innerHTML = emptyHtml(); return; }
+    if (!s.ids.length) { main.innerHTML = emptyHtml(); if ($('#dim-txt')) $('#dim-txt').textContent = ''; return; }
     const c = data.cards.find(x => x.id === s.ids[s.idx]);
     const at = listen.on || listen.step ? (listenSteps(c)[listen.step] || {}).at : null;
     const now = (k) => at === k ? ' now' : '';
+    if ($('#dim-txt')) $('#dim-txt').innerHTML = `${esc(c.front)}<small>${listen.on ? `${s.idx + 1} / ${s.ids.length}` : '일시정지'}</small>`;
     main.innerHTML = `
       <div class="progress"><div style="width:${(s.idx + 1) / s.ids.length * 100}%"></div></div>
       <div class="q-card l-card">
@@ -595,14 +669,17 @@
     wrong.forEach(it => items.push({ ...it, mode: 'type' }));
     const used = new Set([...fresh, ...wrong.map(it => it.card)]);
     const take = (n, mode, from) => { for (const c of from) { if (used.has(c)) continue; used.add(c); items.push({ card: c, ex: shuffle(okEx(c))[0], mode }); if (--n <= 0) break; } };
-    // 복습은 최근에 안 본 카드부터
-    const stale = old.sort((a, b) => ((marks[a.id] || {}).last || '').localeCompare((marks[b.id] || {}).last || ''));
-    take(Math.max(1, 3 - wrong.length), 'type', stale);
+    // 복습은 복습일이 된 카드부터 (오래 밀린 것, 낮은 칸 먼저). 모자라면 복습일이 가까운 카드로 채운다
+    const rk = (c) => review(c) || { b: 0, d: '' };
+    const due = old.filter(isDue).sort((a, b) => rk(a).d.localeCompare(rk(b).d) || rk(a).b - rk(b).b);
+    const stale = [...due, ...old.filter(c => !isDue(c)).sort((a, b) => rk(a).d.localeCompare(rk(b).d))];
+    const extra = Math.min(4, Math.max(0, due.length - 7));   // 밀린 복습이 많으면 빈칸을 몇 개 더
+    take(Math.max(1, 3 - wrong.length) + extra, 'type', stale);
     take(2, 'write', stale);
     if (TTS) take(2, 'listen', stale);
     // 배운 게 아직 적으면 새 표현으로 한 번 더 연습한다
     if (old.length < 3) fresh.forEach(c => { const ex = okEx(c)[1] || okEx(c)[0]; items.push({ card: c, ex, mode: 'type' }); if (TTS) items.push({ card: c, ex: okEx(c)[0], mode: 'listen' }); });
-    return { unit: u, fresh, items };
+    return { unit: u, fresh, items, due: pool('due').length };
   }
   function startDaily() {
     const d = dailyItems();
@@ -868,6 +945,10 @@
     const us = levelInfo(lv).parts.flatMap(p => p.units.map(x => x.n));
     return { done: us.filter(unitDone).length, started: us.filter(u => unitSeen(u) > 0).length, ready: us.filter(unitReady).length, total: us.length };
   }
+  // 홈의 듣기 바로가기: 복습할 카드, 최근 배운 카드, 지금 과 (비어 있는 것은 뺀다)
+  const HEAR_NAME = { due: '복습할 카드', recent: '최근 배운 카드', wrong: '오답노트' };
+  const hearScopes = (u) => [...['due', 'recent'], ...(u != null ? [`u${u}`] : ['all'])]
+    .map(f => [f, pool(f).length]).filter(([, n]) => n).slice(0, 3);
   const ring = (pct, size = 64) => {
     const r = (size - 8) / 2, c = 2 * Math.PI * r;
     return `<svg class="ring" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}"><circle cx="${size / 2}" cy="${size / 2}" r="${r}"/><circle cx="${size / 2}" cy="${size / 2}" r="${r}" class="fg" stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - pct / 100)}"/></svg>`;
@@ -900,14 +981,17 @@
         <div class="hero-kicker">${today.sets ? '오늘 학습 완료' : '오늘의 학습'}</div>
         <h2>${today.sets ? `${today.sets}세트 · ${today.n}문제 풀었어요` : u != null ? esc(unitTitle(u)) : '복습'}</h2>
         <p>${nNew ? `새 표현 ${nNew}개 + 복습 ${nRev}문제` : `복습 ${d.items.length}문제`} · 약 ${Math.max(3, Math.round(d.items.length * 0.8))}분</p>
+        ${d.due ? `<div class="hero-due">${today.sets ? '아직' : '오늘'} 복습할 카드 <b>${d.due}장</b></div>` : ''}
         <button class="cta block" id="h-start">${today.sets ? '한 세트 더' : '시작하기'}</button>
       </section>
+      ${TTS ? `<div class="label">듣기만 하기 <span class="lbl-sub">화면 안 봐도 돼요</span></div>
+      <div class="hear-row">${hearScopes(u).map(([f, n]) => `<button type="button" data-f="${f}">${ICON.headphones}<span>${esc(HEAR_NAME[f] || scopeName(f))}</span><b>${n}장</b></button>`).join('')}</div>` : ''}
       <div class="label">빠른 연습</div>
       <div class="tiles">
         <button type="button" data-m="order"><i class="t1">${ICON.pen}</i><span>문장 조립</span></button>
         <button type="button" data-m="write"><i class="t2">${ICON.pen}</i><span>영작</span></button>
         ${TTS ? `<button type="button" data-m="listen"><i class="t3">${ICON.sound}</i><span>받아쓰기</span></button>` : ''}
-        ${TTS ? `<button type="button" data-m="hear"><i class="t4">${ICON.headphones}</i><span>듣기 모드</span></button>` : ''}
+        <button type="button" data-m="choice"><i class="t4">${ICON.check}</i><span>보기 고르기</span></button>
         <button type="button" data-m="wrong"><i class="t5">${ICON.x}</i><span>오답노트 ${pool('wrong').length}</span></button>
         <button type="button" data-m="cards"><i class="t6">${ICON.card}</i><span>카드 ${seenAll}/${data.cards.length}</span></button>
       </div>
@@ -924,13 +1008,13 @@
     $('#h-course').onclick = () => selectTab('course');
     $('#home-body').querySelectorAll('.tiles button').forEach(b => b.onclick = () => {
       const m = b.dataset.m;
-      if (m === 'hear') { filter = u != null ? `u${u}` : 'all'; return showView('listen'); }
       if (m === 'cards') { filter = 'all'; return selectTab('cards'); }
       if (m === 'wrong') { if (!pool('wrong').length) return toast('오답노트가 비어 있어요'); quizSource = 'wrong'; quizMode = 'type'; }
       else { quizSource = u != null && unitSeen(u) ? `u${u}` : 'all'; quizMode = m; }
       save('quizMode', quizMode); quiz = null;
       selectTab('quiz', false, true); startQuiz();
     });
+    $('#home-body').querySelectorAll('.hear-row button').forEach(b => b.onclick = () => openListen(b.dataset.f, 'home', true));
     wireUnitRows($('#home-body'));
     if ($('#h-self')) $('#h-self').onclick = () => { filter = 'self'; selectTab('cards'); };
   }
@@ -975,7 +1059,7 @@
         const a = b.dataset.a;
         if (a === 'grammar') { location.hash = `#g/${art.id}`; return; }
         if (a === 'cards') { filter = `u${un}`; return selectTab('cards'); }
-        if (a === 'hear') { filter = `u${un}`; return showView('listen'); }
+        if (a === 'hear') return openListen(`u${un}`, 'course', true);
         quizSource = `u${un}`; quizMode = a; save('quizMode', quizMode); quiz = null;
         selectTab('quiz', false, true); startQuiz();
       }));
@@ -1066,6 +1150,11 @@
     const max = Math.max(1, ...byCat.map(x => x[1]));
     const solved = data.cards.reduce((a, c) => a + hist(c).r + hist(c).w, 0);
     const rightAll = data.cards.reduce((a, c) => a + hist(c).r, 0);
+    // 복습 일정: 배운 카드를 다음 복습일로 묶는다
+    const ds = data.cards.map(review).filter(Boolean).map(r => r.d), t0 = dayKey();
+    const plan = [['오늘', ds.filter(d => d <= t0).length], ['내일', ds.filter(d => d === addDays(t0, 1)).length],
+      ['이번 주', ds.filter(d => d > addDays(t0, 1) && d <= addDays(t0, 7)).length], ['그 뒤', ds.filter(d => d > addDays(t0, 7)).length]];
+    const planMax = Math.max(1, ...plan.map(x => x[1]));
     const weak = data.cards.filter(c => hist(c).w > 0).sort((a, b) => hist(b).w - hist(a).w || hist(a).r - hist(b).r).slice(0, 5);
     $('#stats-body').innerHTML = `
       <header class="topbar"><button class="back" id="s-back">← 홈으로</button></header>
@@ -1075,11 +1164,17 @@
         <div class="metric"><div class="label">학습한 날</div><div class="value">${Object.keys(days).filter(k => studied(new Date(k))).length}</div></div>
         <div class="metric"><div class="label">배운 카드</div><div class="value">${data.cards.filter(isSeen).length}<small> / ${data.cards.length}</small></div></div>
         <div class="metric"><div class="label">익힌 카드</div><div class="value">${data.cards.filter(mastered).length}</div></div>
+        <div class="metric"><div class="label">오늘 복습할 카드</div><div class="value">${count('due')}</div></div>
+        <div class="metric"><div class="label">들은 카드</div><div class="value">${Object.values(days).reduce((a, d) => a + (d.lis || 0), 0)}</div></div>
         <div class="metric"><div class="label">오답노트</div><div class="value">${count('wrong')}</div></div>
         <div class="metric"><div class="label">즐겨찾기</div><div class="value">${count('fav')}</div></div>
         <div class="metric"><div class="label">푼 문제</div><div class="value">${solved}</div></div>
         <div class="metric"><div class="label">정답률</div><div class="value">${solved ? Math.round(rightAll / solved * 100) + '%' : '-'}</div></div>
       </div>
+      ${plan.some(x => x[1]) ? `<div class="section"><h3>복습 일정</h3>
+        ${plan.map(([k, n]) => `<div class="bar-row"><span class="name">${k}</span><div class="bar"><div style="width:${n / planMax * 100}%"></div></div><span class="n">${n}</span></div>`).join('')}
+        <div class="muted" style="margin-top:8px">맞히면 다음 복습이 1일 → 3일 → 7일 → 14일 → 30일 → 60일 뒤로 늘어나고, 틀리면 다음 날 다시 나와요.</div>
+      </div>` : ''}
       ${weak.length ? `<div class="section"><h3>자주 틀리는 카드</h3>
         ${weak.map(c => `<div class="bar-row"><span class="name wide">${esc(c.front)}</span><span class="n">${hist(c).w}회</span></div>`).join('')}
       </div>` : ''}
@@ -1152,6 +1247,8 @@
       if (x.hist || y.hist) m.hist = { r: Math.max((x.hist || {}).r || 0, (y.hist || {}).r || 0), w: Math.max((x.hist || {}).w || 0, (y.hist || {}).w || 0) };
       const seen = [x.seen, y.seen].filter(Boolean).sort()[0]; if (seen) m.seen = seen;
       const last = [x.last, y.last].filter(Boolean).sort().pop(); if (last) m.last = last;
+      // 복습 간격은 더 최근에 채점된 쪽. 같은 날이면 복습일이 이른 쪽 (덜 외운 것으로 본다)
+      const rv = [x.rv, y.rv].filter(Boolean).sort((p, q) => (q.t || '').localeCompare(p.t || '') || p.d.localeCompare(q.d))[0]; if (rv) m.rv = rv;
       if (Object.keys(m).length) out[id] = m;
     }
     return out;
@@ -1160,7 +1257,7 @@
     const out = {};
     for (const k of new Set([...Object.keys(a), ...Object.keys(b)])) {
       const x = a[k] || {}, y = b[k] || {};
-      out[k] = { sets: Math.max(x.sets || 0, y.sets || 0), quiz: Math.max(x.quiz || 0, y.quiz || 0), n: Math.max(x.n || 0, y.n || 0), r: Math.max(x.r || 0, y.r || 0) };
+      out[k] = { sets: Math.max(x.sets || 0, y.sets || 0), quiz: Math.max(x.quiz || 0, y.quiz || 0), n: Math.max(x.n || 0, y.n || 0), r: Math.max(x.r || 0, y.r || 0), lis: Math.max(x.lis || 0, y.lis || 0) };
     }
     return out;
   }
@@ -1239,7 +1336,7 @@
 
   // ───────── 탭 / 공통 ─────────
   function showView(name) {
-    if (name !== 'listen') stopListen();
+    if (name !== 'listen') { stopListen(); if ($('#dim')) $('#dim').remove(); }
     document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === `view-${name}`));
     if (name === 'home') renderHome();
     if (name === 'course') renderCourse();
