@@ -2,7 +2,8 @@
   'use strict';
 
   // ───────── 저장소 ─────────
-  const K_MARKS = 'eng-marks';        // { cardId: { fav: true, wrong: { 예문: true }, hist: { r, w } } }
+  const K_MARKS = 'eng-marks';        // { cardId: { fav: true, wrong: { 예문: true }, hist: { r, w }, seen, last, rv, u: 마지막으로 바꾼 시각 } }
+  const K_RESET = 'eng-reset-at';     // "모두 지우기"를 누른 시각. 동기화할 때 그 전 기록을 버린다
   const K_SETTINGS = 'eng-settings';
   const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
   const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} if (k === K_MARKS || k === 'eng-days') syncSoon(); };
@@ -37,6 +38,7 @@
     chev: svg('M10 6.5l5.5 5.5-5.5 5.5'),
     book: svg('M12 6.5C10 5 7 4.6 4 5v13.5c3-.4 6 0 8 1.5 2-1.5 5-1.9 8-1.5V5c-3-.4-6 0-8 1.5zM12 6.5V20'),
     pen: svg('M5 19l1-4L16.5 4.5l3 3L9 18zM14.5 6.5l3 3'),
+    search: svg('M10.5 4.5a6 6 0 1 1 0 12 6 6 0 0 1 0-12zM15 15l4.5 4.5'),
     moon: svg('M19 14.5A7.5 7.5 0 0 1 9.5 5a7.5 7.5 0 1 0 9.5 9.5z'),
   };
   // ───────── 학습한 날 (홈의 연속 학습일과 이번 주) ─────────
@@ -58,10 +60,13 @@
     return n;
   }
   const isMarked = (c, key) => !!(marks[c.id] && marks[c.id][key]);
+  // 카드 기록을 바꿀 때마다 바꾼 시각(u)을 남긴다. 두 기기를 합칠 때 더 최근에 바꾼 쪽을 따르려고.
+  // 다 지워져도 { u } 는 남겨 둔다 (지운 것도 다른 기기에 전해지게)
+  const stamp = (m) => { m.u = new Date().toISOString(); return m; };
   function setMark(c, key, on) {
     const m = marks[c.id] || {};
     if (on) m[key] = true; else delete m[key];
-    if (Object.keys(m).length) marks[c.id] = m; else delete marks[c.id];
+    marks[c.id] = stamp(m);
     save(K_MARKS, marks);
     return on;
   }
@@ -74,7 +79,7 @@
     const w = m.wrong || {};
     if (on) w[ex.en] = true; else delete w[ex.en];
     if (Object.keys(w).length) m.wrong = w; else delete m.wrong;
-    if (Object.keys(m).length) marks[c.id] = m; else delete marks[c.id];
+    marks[c.id] = stamp(m);
     save(K_MARKS, marks);
   }
   // 시험 기록: 카드별 맞힌 횟수 r, 틀린 횟수 w
@@ -105,7 +110,7 @@
     const m = marks[c.id];
     const h = m.hist || { r: 0, w: 0 };
     if (ok) h.r += 1; else h.w += 1;
-    m.hist = h; m.last = dayKey(); marks[c.id] = m; save(K_MARKS, marks);
+    m.hist = h; m.last = dayKey(); marks[c.id] = stamp(m); save(K_MARKS, marks);
     logDay(d => { d.n += 1; if (ok) d.r += 1; });
   }
   // 배운 카드: 오늘의 학습에서 소개받았거나(seen) 시험에 한 번이라도 나온 카드
@@ -115,15 +120,25 @@
     if (m.seen) return;
     m.seen = dayKey();
     if (!m.rv) m.rv = { b: 0, d: m.seen, t: '' };   // 소개받은 날 바로 복습일. 그날 처음 맞히면 내일로 간다
-    marks[c.id] = m; save(K_MARKS, marks);
+    marks[c.id] = stamp(m); save(K_MARKS, marks);
   }
-  // 필터: all | due (복습일이 된 카드) | recent (최근 7일 배운 카드) | wrong | fav | 단어 | 표현 | 패턴 | u3 (교재 3과) | self (교재 밖에서 직접 정리한 카드)
+  // 필터: all | due (복습일이 된 카드) | recent (최근 7일 배운 카드) | wrong | fav | 단어 | 표현 | 패턴 | u3 (교재 3과) | lv2 (레벨 2) | p7 (목차의 8번째 부) | self (교재 밖에서 직접 정리한 카드)
   const unitOf = (f) => /^u\d+$/.test(f) ? Number(f.slice(1)) : null;
+  const lvOf = (f) => /^lv\d+$/.test(f) ? Number(f.slice(2)) : null;
+  const partOf = (f) => /^p\d+$/.test(f) ? allParts()[Number(f.slice(1))] || null : null;
   const isRecent = (c) => ((marks[c.id] || {}).seen || '') >= dayKey(daysAgo(6));
-  const pool = (f) => data.cards.filter(c => f === 'all' ? true : f === 'due' ? isDue(c) : f === 'recent' ? isRecent(c) : f === 'wrong' ? isWrong(c) : f === 'fav' ? isMarked(c, f) : f === 'self' ? c.unit == null : unitOf(f) != null ? c.unit === unitOf(f) : c.category === f);
-  const filterLabel = (f) => f === 'all' ? '전체' : f === 'due' ? '오늘 복습할 카드' : f === 'recent' ? '최근 7일 배운 카드' : f === 'wrong' ? '오답노트' : f === 'fav' ? '즐겨찾기' : f === 'self' ? '직접 정리한 카드' : unitOf(f) != null ? `${unitOf(f)}과` : f;
+  const inScope = (c, f) => {
+    if (lvOf(f) != null) return c.unit != null && levelOf(c.unit) === lvOf(f);
+    const p = partOf(f);
+    if (p) return c.unit != null && p.units.some(x => x.n === c.unit);
+    return unitOf(f) != null ? c.unit === unitOf(f) : c.category === f;
+  };
+  const pool = (f) => data.cards.filter(c => f === 'all' ? true : f === 'due' ? isDue(c) : f === 'recent' ? isRecent(c) : f === 'wrong' ? isWrong(c) : f === 'fav' ? isMarked(c, f) : f === 'self' ? c.unit == null : inScope(c, f));
+  const filterLabel = (f) => f === 'all' ? '전체' : f === 'due' ? '오늘 복습할 카드' : f === 'recent' ? '최근 7일 배운 카드' : f === 'wrong' ? '오답노트' : f === 'fav' ? '즐겨찾기' : f === 'self' ? '직접 정리한 카드'
+    : unitOf(f) != null ? `${unitOf(f)}과` : lvOf(f) != null ? `레벨 ${lvOf(f)} ${(levelInfo(lvOf(f)) || {}).name || ''}` : partOf(f) ? partOf(f).name : f;
   const unitKeys = () => [...new Set(data.cards.map(c => c.unit).filter(u => u != null))].sort((a, b) => a - b).map(u => `u${u}`);
   // 목차의 모든 과를 순서대로. 각 과에 level, part 를 붙인다
+  const allParts = () => course.levels.flatMap(lv => lv.parts.map(p => ({ ...p, level: lv.level })));
   const allUnits = () => course.levels.flatMap(lv => lv.parts.flatMap(p => p.units.map(x => ({ ...x, level: lv.level, part: p.name }))));
   const unitInfo = (u) => allUnits().find(x => x.n === u);
   const unitTitle = (u) => {
@@ -137,12 +152,40 @@
   const scopeName = (f) => unitOf(f) != null ? `${unitOf(f)}과 · ${unitTitle(unitOf(f))}` : filterLabel(f);
   // 범위 고르기: 칩 줄 대신 버튼 하나. 누르면 아래에서 묶음별 목록이 올라온다
   const scopeBtn = (id, f, n, unit = '') => `<button type="button" class="scope" id="${id}"><span>${esc(scopeName(f))}</span><b>${n}${unit}</b>${ICON.down}</button>`;
+  // 교재는 레벨 → 부 → 과로 접혀 있고, 누르면 펼쳐진다. 레벨 전체, 부 전체도 고를 수 있다
   function openScope(cur, count, pick) {
-    const row = (k) => `<button type="button" class="sh-row${k === cur ? ' on' : ''}" data-f="${k}"><span>${esc(scopeName(k))}</span><b>${count(k)}</b>${k === cur ? ICON.check : '<i></i>'}</button>`;
-    const groups = [['', ['all', ...['due', 'recent'].filter(k => pool(k).length), 'wrong', 'fav']], ['종류', TYPES.filter(t => pool(t).length)],
-      ['교재', [...unitKeys(), ...(pool('self').length && unitKeys().length ? ['self'] : [])]]];
-    openSheet(`<h3>범위</h3>${groups.filter(g => g[1].length).map(([t, ks]) => `${t ? `<div class="sh-g">${t}</div>` : ''}${ks.map(row).join('')}`).join('')}`,
-      (sh, close) => sh.querySelectorAll('.sh-row').forEach(b => b.onclick = () => { close(); pick(b.dataset.f); }));
+    const row = (k, label, cls = '') => `<button type="button" class="sh-row${cls}${k === cur ? ' on' : ''}" data-f="${k}"><span>${esc(label || scopeName(k))}</span><b>${count(k)}</b>${k === cur ? ICON.check : '<i></i>'}</button>`;
+    const top = ['all', ...['due', 'recent'].filter(k => pool(k).length), 'wrong', 'fav'];
+    const types = TYPES.filter(t => pool(t).length);
+    const have = new Set(data.cards.map(c => c.unit).filter(u => u != null));
+    const parts = allParts().map((p, i) => ({ ...p, key: `p${i}`, units: p.units.filter(x => have.has(x.n)) })).filter(p => p.units.length);
+    // 처음에 펼쳐 둘 곳: 지금 고른 범위가 든 레벨·부, 없으면 지금 공부하는 과의 레벨
+    const curUnit = unitOf(cur) ?? currentUnit();
+    const openLv = new Set([lvOf(cur) ?? (partOf(cur) || {}).level ?? (curUnit != null ? levelOf(curUnit) : 1)]);
+    const openPt = new Set(parts.filter(p => p.key === cur || p.units.some(x => x.n === unitOf(cur))).map(p => p.key));
+    const tree = () => course.levels.filter(l => parts.some(p => p.level === l.level)).map(l => {
+      const lk = `lv${l.level}`, on = openLv.has(l.level);
+      return `<button type="button" class="sh-row sh-lv${on ? ' open' : ''}" data-lv="${l.level}"><span><i class="dot ${LEVEL_CLS[l.level]}"></i>레벨 ${l.level} ${esc(l.name)}</span><b>${count(lk)}</b>${on ? ICON.down.replace('<svg', '<svg style="transform:rotate(180deg)"') : ICON.down}</button>`
+        + (on ? row(lk, `레벨 ${l.level} 전체`, ' sh-sub') + parts.filter(p => p.level === l.level).map(p => {
+          const po = openPt.has(p.key);
+          return `<button type="button" class="sh-row sh-pt${po ? ' open' : ''}" data-pt="${p.key}"><span>${esc(p.name)}</span><b>${count(p.key)}</b>${po ? ICON.down.replace('<svg', '<svg style="transform:rotate(180deg)"') : ICON.down}</button>`
+            + (po ? row(p.key, `${p.name} 전체`, ' sh-sub2') + p.units.map(x => row(`u${x.n}`, '', ' sh-sub2')).join('') : '');
+        }).join('') : '');
+    }).join('');
+    openSheet('', (sh, close) => {
+      const paint = () => {
+        sh.innerHTML = `<h3>범위</h3>${top.map(k => row(k)).join('')}
+          ${types.length ? `<div class="sh-g">종류</div>${types.map(k => row(k)).join('')}` : ''}
+          ${parts.length ? `<div class="sh-g">교재</div>${tree()}` : ''}
+          ${pool('self').length && parts.length ? row('self') : ''}`;
+        sh.querySelectorAll('.sh-row[data-f]').forEach(b => b.onclick = () => { close(); pick(b.dataset.f); });
+        sh.querySelectorAll('.sh-row[data-lv]').forEach(b => b.onclick = () => { const n = Number(b.dataset.lv); openLv.has(n) ? openLv.delete(n) : openLv.add(n); paint(); });
+        sh.querySelectorAll('.sh-row[data-pt]').forEach(b => b.onclick = () => { const k = b.dataset.pt; openPt.has(k) ? openPt.delete(k) : openPt.add(k); paint(); });
+      };
+      paint();
+      const on = sh.querySelector('.sh-row.on');
+      if (on) on.scrollIntoView({ block: 'center' });
+    });
   }
   function openSheet(html, wire) {
     const bg = document.createElement('div');
@@ -260,6 +303,7 @@
           <button class="icon-btn" id="open-stats" aria-label="기록·설정">${ICON.chart}</button>
         </div>
       </header>
+      <label class="srch">${ICON.search}<input id="search" type="search" placeholder="영어·한국어로 카드 찾기" autocomplete="off" enterkeyhint="search" value="${esc(query)}"></label>
       <div class="subbar"><div id="filters"></div><div id="sub-right"></div></div>
       <div id="cards-main"></div>`;
     $('#open-stats').onclick = () => showView('stats');
@@ -267,11 +311,47 @@
     document.querySelectorAll('.iseg button').forEach(b => b.onclick = () => {
       settings.mode = b.dataset.mode; save(K_SETTINGS, settings); renderCards();
     });
+    $('#search').addEventListener('input', (e) => { query = e.target.value; renderFilters(); paintCards(); });
     renderFilters();
-    if (mode === 'card') renderStudy(); else renderList();
+    paintCards();
+  }
+  // 검색어가 있으면 전체 카드에서 찾은 결과, 없으면 고른 범위를 카드나 목록으로
+  function paintCards() {
+    $('#cards-body').className = settings.mode === 'card' && !query.trim() ? 'mode-card' : '';
+    if (query.trim()) return renderSearch();
+    if (settings.mode === 'card') renderStudy(); else renderList();
+  }
+  function renderSearch() {
+    const q = query.trim().toLowerCase();
+    // 앞면에서 찾은 것 먼저, 그다음 뜻, 예문, 메모
+    const has = (t) => String(t || '').toLowerCase().includes(q);
+    const rank = (c) => has(c.front) ? 0 : has(c.meaning) ? 1 : (c.examples || []).some(ex => has(ex.en) || has(ex.ko)) ? 2 : has(c.note) ? 3 : 9;
+    const found = data.cards.map(c => [c, rank(c)]).filter(x => x[1] < 9).sort((a, b) => a[1] - b[1]).map(x => x[0]);
+    const hl = (t) => { const i = String(t || '').toLowerCase().indexOf(q); return i < 0 ? esc(t) : esc(t.slice(0, i)) + `<mark>${esc(t.slice(i, i + q.length))}</mark>` + esc(t.slice(i + q.length)); };
+    $('#sub-right').innerHTML = '';
+    $('#cards-main').innerHTML = !found.length ? `<div class="empty">"${esc(query.trim())}" 찾은 카드가 없어요</div>` : found.slice(0, 100).map(c => {
+      const r = rank(c);   // 예문·메모에서만 찾았으면 찾은 곳을 보여 준다
+      const ex = r === 2 && (c.examples || []).find(e => has(e.en) || has(e.ko));
+      const memo = r === 3 ? (() => { const i = c.note.toLowerCase().indexOf(q); return (i > 20 ? '…' : '') + c.note.slice(Math.max(0, i - 20), i + q.length + 30); })() : '';
+      return `<div class="item" data-id="${c.id}">
+          <div class="row">
+            <div class="txt"><div class="front">${hl(c.front)}<span class="tag">${c.unit != null ? `${c.unit}과` : esc(c.category)}</span></div>
+              <div class="sum">${ex ? `예문: ${hl(has(ex.en) ? ex.en : ex.ko)}` : memo ? `메모: ${hl(memo)}` : hl(c.meaning)}</div></div>
+            ${favBtn(c, 'mk')}
+          </div>
+          <div class="detail">${backHtml(c)}</div></div>`;
+    }).join('') + (found.length > 100 ? `<div class="muted center">앞의 100장만 보여요. 검색어를 더 길게 써 보세요.</div>` : '');
+    const body = $('#cards-main');
+    wireGrammarLinks(body, 'cards');
+    body.querySelectorAll('.item').forEach(el => {
+      const c = data.cards.find(x => x.id === el.dataset.id);
+      el.querySelector('.row').onclick = (e) => { if (!e.target.closest('.mk')) el.classList.toggle('open'); };
+      wireFav(el.querySelector('.mk'), c);
+    });
   }
   // 범위 버튼 하나. 누르면 범위 목록이 아래에서 올라온다
   function renderFilters() {
+    if (query.trim()) { $('#filters').innerHTML = `<span class="muted">전체 카드에서 찾는 중</span>`; return; }
     $('#filters').innerHTML = scopeBtn('f-scope', filter, pool(filter).length, '장');
     $('#f-scope').onclick = () => openScope(filter, k => pool(k).length, (k) => { filter = k; renderCards(); });
   }
@@ -352,7 +432,7 @@
   }
   document.addEventListener('keydown', (e) => {
     if (!$('#view-cards').classList.contains('active') || settings.mode !== 'card' || !$('#card')) return;
-    if (e.target.tagName === 'INPUT') return;
+    if (e.target.tagName === 'INPUT' || query.trim()) return;
     if (e.key === ' ') { e.preventDefault(); flip(); }
     else if (e.key === 'ArrowRight' || e.key === 'Enter') move(1);
     else if (e.key === 'ArrowLeft' && session().idx > 0) move(-1);
@@ -360,17 +440,14 @@
 
   function renderList() {
     $('#sub-right').innerHTML = '';
-    $('#cards-main').innerHTML = `
-      <input id="search" type="search" placeholder="영어 또는 한국어로 검색" autocomplete="off" value="${esc(query)}">
-      <div id="list-body"></div>`;
-    $('#search').addEventListener('input', (e) => { query = e.target.value; fillList(); });
+    $('#cards-main').innerHTML = `<div id="list-body"></div>`;
     fillList();
   }
   function fillList() {
-    const q = query.trim().toLowerCase();
-    const cards = pool(filter).filter(c => !q || [c.front, c.meaning, c.example, c.note, c.title].join(' ').toLowerCase().includes(q));
+    const cards = pool(filter);
     const body = $('#list-body');
-    if (!cards.length) { body.innerHTML = q ? `<div class="empty">검색 결과가 없어요</div>` : emptyHtml(); return; }
+    if (!body) return;
+    if (!cards.length) { body.innerHTML = emptyHtml(); return; }
     const groups = new Map();
     for (const c of cards) {
       const key = `${c.date}|${c.title}`;
@@ -654,17 +731,19 @@
     if (!units.length) return null;
     return units.find(u => unitSeen(u) < unitCards(u).length) ?? units.find(u => !unitDone(u)) ?? units[units.length - 1];
   }
-  const DAILY_NEW = 3;
+  // 하루 새 표현 수: 가볍게 2 / 보통 3 / 많이 5 (홈에서 고르고 기억한다)
+  const AMOUNTS = [[2, '가볍게'], [3, '보통'], [5, '많이']];
+  const dailyNew = () => AMOUNTS.some(a => a[0] === settings.dailyNew) ? settings.dailyNew : 3;
   const randomEx = (c) => c.examples[Math.random() * c.examples.length | 0];
   const okEx = (c) => (c.examples || []).filter(ex => ex.mark && ex.en.includes(ex.mark));
   // 오늘의 학습 한 세트: 새 표현 소개 → 새 표현으로 문장 조립 → 오답·복습 빈칸 → 복습 영작 → 받아쓰기
   function dailyItems() {
     const u = currentUnit();
-    const fresh = (u != null ? unitCards(u) : data.cards).filter(c => !isSeen(c) && okEx(c).length).slice(0, DAILY_NEW);
+    const fresh = (u != null ? unitCards(u) : data.cards).filter(c => !isSeen(c) && okEx(c).length).slice(0, dailyNew());
     const old = shuffle(data.cards.filter(c => isSeen(c) && okEx(c).length && !fresh.includes(c)));
     const items = [];
     fresh.forEach(c => items.push({ card: c, ex: okEx(c)[0], mode: 'intro' }));
-    fresh.forEach(c => items.push({ card: c, ex: okEx(c)[0], mode: 'order' }));
+    fresh.forEach(c => items.push({ card: c, ex: okEx(c).slice().sort((a, b) => orderTokens(a).length - orderTokens(b).length)[0], mode: 'order' }));   // 조립은 가장 짧은 예문으로
     const wrong = shuffle(quizItems('wrong')).slice(0, 3);
     wrong.forEach(it => items.push({ ...it, mode: 'type' }));
     const used = new Set([...fresh, ...wrong.map(it => it.card)]);
@@ -679,7 +758,7 @@
     if (TTS) take(2, 'listen', stale);
     // 배운 게 아직 적으면 새 표현으로 한 번 더 연습한다
     if (old.length < 3) fresh.forEach(c => { const ex = okEx(c)[1] || okEx(c)[0]; items.push({ card: c, ex, mode: 'type' }); if (TTS) items.push({ card: c, ex: okEx(c)[0], mode: 'listen' }); });
-    return { unit: u, fresh, items, due: pool('due').length };
+    return { unit: u, fresh, items, due: pool('due').length, old: old.length };
   }
   function startDaily() {
     const d = dailyItems();
@@ -716,10 +795,43 @@
       <header class="topbar"><button class="back" id="q-quit">${quiz.daily ? '그만하기' : '그만하기'}</button><div class="right">${quiz.idx + 1} / ${quiz.items.length}</div></header>
       <div class="progress"><div style="width:${quiz.idx / quiz.items.length * 100}%"></div></div>`;
   const wireQuit = () => { $('#q-quit').onclick = () => { const d = quiz.daily; quiz = null; if (d) selectTab('home'); else renderQuiz(); }; };
-  // 문장 배열: 해석만 보여 주고, 섞인 단어를 눌러 예문 전체를 순서대로 만든다
-  // 대화 예문의 화자 표시(A: B:)와 문장부호는 뺀다
+  // 문장 조립에 쓸 부분: 대화 예문은 표현이 든 사람의 말만, 그 말이 길면 표현이 든 문장·마디까지만 (서서 한 손으로 누르기 좋게)
+  const ORDER_MAX = 10;
+  const wc = (t) => t.trim().split(/\s+/).filter(Boolean).length;
+  // "A: ... B: ..." → [{ who: 'A', text }, ...]. 대화가 아니면 [{ who: '', text }]
+  function splitTurns(t) {
+    const parts = String(t || '').split(/(?:^|\s)([A-Z]):\s/);
+    if (parts.length < 3) return [{ who: '', text: String(t || '').trim() }];
+    const out = [];
+    for (let i = 1; i < parts.length; i += 2) out.push({ who: parts[i], text: parts[i + 1].trim() });
+    return out;
+  }
+  function orderPart(ex) {
+    const mk = (ex.mark || '').toLowerCase();
+    const turns = splitTurns(ex.en), kturns = splitTurns(ex.ko);
+    let ti = turns.findIndex(t => t.text.toLowerCase().includes(mk));
+    if (ti < 0) ti = turns.length - 1;
+    const turn = turns[ti];
+    const ko = (kturns.length === turns.length ? kturns[ti].text : ex.ko) || '';
+    let en = turn.text;
+    if (wc(en) > ORDER_MAX) {
+      const sents = en.split(/(?<=[.?!])\s+/);
+      let s = sents[Math.max(0, sents.findIndex(x => x.toLowerCase().includes(mk)))];
+      if (wc(s) > ORDER_MAX) {
+        // 문장 처음부터 표현이 끝나는 마디(쉼표 단위)까지
+        const end = s.toLowerCase().indexOf(mk) + mk.length, take = [];
+        let len = 0;
+        for (const c of s.split(/(?<=[,;:])\s+/)) { take.push(c); len += c.length + 1; if (len >= end) break; }
+        const t2 = take.join(' ');
+        if (wc(t2) <= ORDER_MAX + 2) s = t2;
+      }
+      en = s.replace(/[,;:]$/, '');
+    }
+    return { en, ko, ctx: turns.slice(0, ti), who: turn.who, cut: en !== turn.text };
+  }
+  // 문장 배열: 해석만 보여 주고, 섞인 단어를 눌러 문장을 순서대로 만든다. 문장부호는 뺀다
   function orderTokens(ex) {
-    const t = ex.en.trim().split(/\s+/).filter(x => !/^[A-Z]:$/.test(x)).map(x => x.replace(/^["“(]+|[.,!?;:"”)]+$/g, '')).filter(Boolean);
+    const t = orderPart(ex).en.split(/\s+/).map(x => x.replace(/^["“(]+|[.,!?;:"”)]+$/g, '')).filter(Boolean);
     if (t.length && !/^I\b/.test(t[0])) t[0] = t[0][0].toLowerCase() + t[0].slice(1);   // 첫 단어가 대문자로 드러나지 않게
     return t;
   }
@@ -743,16 +855,17 @@
   }
   function renderOrderQuestion() {
     const { card: c, ex } = quiz.items[quiz.idx];
-    const words = orderTokens(ex);
+    const words = orderTokens(ex), part = orderPart(ex);
     let bank = shuffle(words.map((_, i) => i));
     if (words.length > 1 && bank.every((v, i) => v === i)) bank.push(bank.shift());
     const picked = [];
     quiz.answered = false;
     $('#quiz-body').innerHTML = `${quizHead()}
       <div class="q-card">${favBtn(c, 'star')}
-        <div class="type">문장 조립 · 단어 ${words.length}개</div>
+        <div class="type">문장 조립${part.who ? ` · ${part.who}의 말` : ''}${part.cut ? ' · 앞부분' : ''} · 단어 ${words.length}개</div>
         <div class="q-en" id="q-en"></div>
-        <div class="q-ko lg">${esc(ex.ko || c.meaning)}</div>
+        ${part.ctx.map(t => `<div class="q-ctx"><b>${esc(t.who)}</b>${esc(t.text)}</div>`).join('')}
+        <div class="q-ko lg">${esc(part.ko || ex.ko || c.meaning)}</div>
         ${quiz.daily ? `<div class="q-hint">표현: <mark>${esc(c.front)}</mark></div>` : ''}
       </div>
       <div id="q-answer">
@@ -812,14 +925,15 @@
     const words = ex.mark.trim().split(/\s+/).length;
     const blank = `<span class="blank">${Array.from({ length: words }, () => '<i></i>').join('')}</span>`;
     quiz.answered = false;
-    const opts = it.mode === 'choice' ? quizOptions(c, ex) : [];
+    const long = it.mode === 'type' && words > 5;   // 6단어 넘는 빈칸은 타이핑 대신 보기로 (한 손으로 치기 힘들다)
+    const opts = it.mode === 'choice' || long ? quizOptions(c, ex) : [];
     const choice = opts.length > 1;   // 보기를 만들 카드가 모자라면 타이핑으로 낸다
     const dict = it.mode === 'listen';
     const koHtml = `<div class="q-ko">${withMark(ex.ko || c.meaning, ex.koMark, t => `<mark>${esc(t)}</mark>`)}</div>
         ${ex.koMark ? '' : `<div class="q-hint">뜻: <mark>${esc(c.meaning)}</mark></div>`}`;
     $('#quiz-body').innerHTML = `${quizHead()}
       <div class="q-card">${favBtn(c, 'star')}
-        <div class="type">${dict ? '받아쓰기' : `빈칸 채우기 · ${esc(c.category)}`} · 단어 ${words}개</div>
+        <div class="type">${dict ? '받아쓰기' : `빈칸 채우기 · ${long && choice ? '긴 표현은 보기로' : esc(c.category)}`} · 단어 ${words}개</div>
         <div class="q-en" id="q-en">${withMark(ex.en, ex.mark, () => blank)}</div>
         ${dict ? `<div class="q-listen">
           <button type="button" class="ghost" id="q-play">${ICON.sound}다시 듣기</button>
@@ -980,8 +1094,9 @@
         <div class="hero-top"><span class="pill">레벨 ${lv} ${esc(L.name)} · ${esc(L.goal)}</span>${u != null ? `<span>${u}과</span>` : ''}</div>
         <div class="hero-kicker">${today.sets ? '오늘 학습 완료' : '오늘의 학습'}</div>
         <h2>${today.sets ? `${today.sets}세트 · ${today.n}문제 풀었어요` : u != null ? esc(unitTitle(u)) : '복습'}</h2>
-        <p>${nNew ? `새 표현 ${nNew}개 + 복습 ${nRev}문제` : `복습 ${d.items.length}문제`} · 약 ${Math.max(3, Math.round(d.items.length * 0.8))}분</p>
+        <p>${nNew ? `새 표현 ${nNew}개 + ${d.old ? '복습' : '연습'} ${nRev}문제` : `복습 ${d.items.length}문제`} · 약 ${Math.max(3, Math.round(d.items.length * 0.8))}분</p>
         ${d.due ? `<div class="hero-due">${today.sets ? '아직' : '오늘'} 복습할 카드 <b>${d.due}장</b></div>` : ''}
+        <div class="amount" id="h-amount" role="group" aria-label="하루 새 표현 수">${AMOUNTS.map(([n, t]) => `<button type="button" data-n="${n}" class="${n === dailyNew() ? 'on' : ''}">${t} · ${n}개</button>`).join('')}</div>
         <button class="cta block" id="h-start">${today.sets ? '한 세트 더' : '시작하기'}</button>
       </section>
       ${TTS ? `<div class="label">듣기만 하기 <span class="lbl-sub">화면 안 봐도 돼요</span></div>
@@ -1005,6 +1120,7 @@
       ${pool('self').length ? `<div class="label">직접 정리한 카드</div><button type="button" class="u-row ready" id="h-self"><div class="u-num">${ICON.book}</div><div class="u-txt"><div class="u-title">유튜브에서 정리한 표현</div><div class="u-sub">${pool('self').length}장</div></div>${ICON.chev}</button>` : ''}`;
     $('#open-stats').onclick = () => showView('stats');
     $('#h-start').onclick = startDaily;
+    $('#h-amount').querySelectorAll('button').forEach(b => b.onclick = () => { settings.dailyNew = Number(b.dataset.n); save(K_SETTINGS, settings); renderHome(); });
     $('#h-course').onclick = () => selectTab('course');
     $('#home-body').querySelectorAll('.tiles button').forEach(b => b.onclick = () => {
       const m = b.dataset.m;
@@ -1069,9 +1185,11 @@
   const TAB_NAME = { home: '홈', course: '코스', cards: '카드', quiz: '연습' };
   const articleIdFromHash = () => (location.hash.match(/^#g\/(\w+)/) || [])[1];
   // 목록 묶음: 교재 문서는 부별로(빌드가 과 순서로 정렬해 둠), 나머지는 맨 뒤 "그 밖의 문서"
-  function grammarGroups() {
+  // 레벨을 고르면 그 레벨 문서만. 직접 정리한 문서(unit 없음)는 모든 레벨 맨 뒤에
+  let gLevel = null, gQuery = '';
+  function grammarGroups(lv) {
     const groups = [];
-    for (const a of grammar.articles) {
+    for (const a of grammar.articles.filter(a => a.unit == null || levelOf(a.unit) === lv)) {
       const part = a.unit != null ? a.part : '그 밖의 문서';
       const last = groups[groups.length - 1];
       if (last && last[0] === part) last[1].push(a); else groups.push([part, [a]]);
@@ -1129,11 +1247,35 @@
       if ($('#u-quiz')) $('#u-quiz').onclick = () => { leave(); quizSource = `u${art.unit}`; quiz = null; selectTab('quiz'); };
     } else {
       returnTab = null;
+      if (gLevel == null) { const u = currentUnit(); gLevel = u != null ? levelOf(u) : 1; }
+      const nLv = (lv) => grammar.articles.filter(a => a.unit != null && levelOf(a.unit) === lv).length;
       body.innerHTML = `
         <header class="topbar"><h1>문법</h1><div class="right"><span>${grammar.articles.length}편</span></div></header>
-        ${grammar.articles.length ? grammarGroups().map(([part, list]) => `
-          <h2 class="g-part">${esc(part)}</h2>
-          ${list.map(item).join('')}`).join('') : `<div class="empty">아직 문법 문서가 없어요</div>`}`;
+        <label class="srch">${ICON.search}<input id="g-search" type="search" placeholder="문법 이름으로 찾기 (예: 수동태)" autocomplete="off" enterkeyhint="search" value="${esc(gQuery)}"></label>
+        <div class="seg" id="g-seg">${course.levels.map(l => `<button data-l="${l.level}" class="${LEVEL_CLS[l.level]}${l.level === gLevel ? ' active' : ''}"><b>${esc(l.name)}</b>${nLv(l.level)}편</button>`).join('')}</div>
+        <div id="g-list"></div>`;
+      const paintList = () => {
+        const q = gQuery.trim().toLowerCase();
+        let html;
+        if (q) {
+          // 제목에서 찾은 것 먼저, 그다음 요약, 그다음 본문
+          const text = (a) => a.html.replace(/<[^>]+>/g, ' ').toLowerCase();
+          const rank = (a) => a.title.toLowerCase().includes(q) ? 0 : (a.summary || '').toLowerCase().includes(q) || a.tags.some(t => t.toLowerCase().includes(q)) ? 1 : text(a).includes(q) ? 2 : 9;
+          const found = grammar.articles.map(a => [a, rank(a)]).filter(x => x[1] < 9).sort((x, y) => x[1] - y[1] || (x[0].unit ?? 999) - (y[0].unit ?? 999));
+          html = found.length ? `<div class="label">찾은 문서 ${found.length}편${found.some(x => x[1] === 2) ? ' · 본문에 나오는 문서 포함' : ''}</div>${found.slice(0, 30).map(x => item(x[0])).join('')}`
+            : `<div class="empty">"${esc(gQuery.trim())}" 문서를 찾지 못했어요</div>`;
+        } else {
+          const groups = grammarGroups(gLevel);
+          html = groups.length ? groups.map(([part, list]) => `<h2 class="g-part">${esc(part)}<span>${list.length}편</span></h2>${list.map(item).join('')}`).join('')
+            : `<div class="empty">이 레벨은 상황 회화 과라 문법 문서가 없어요. 코스 탭에서 과를 골라 카드로 공부해요.</div>`;
+        }
+        $('#g-list').innerHTML = html;
+        $('#g-seg').hidden = !!q;
+      };
+      paintList();
+      $('#g-search').addEventListener('input', (e) => { gQuery = e.target.value; paintList(); });
+      $('#g-seg').querySelectorAll('button').forEach(b => b.onclick = () => { gLevel = Number(b.dataset.l); $('#g-seg').querySelectorAll('button').forEach(x => x.classList.toggle('active', x === b)); paintList(); });
+      return window.scrollTo(0, 0);
     }
     window.scrollTo(0, 0);
   }
@@ -1206,13 +1348,16 @@
       try {
         const obj = JSON.parse(await f.text());
         if (!obj.marks || typeof obj.marks !== 'object') throw new Error();
-        marks = obj.marks; save(K_MARKS, marks);
+        // 가져온 기록이 기준이 되게: 지금 시각으로 바꾼 것으로 치고, 그 전 기록은 버린다
+        save(K_RESET, new Date(Date.now() - 1000).toISOString());
+        marks = obj.marks; for (const m of Object.values(marks)) stamp(m); save(K_MARKS, marks);
         if (obj.days && typeof obj.days === 'object') { days = obj.days; save(K_DAYS, days); }
         toast('가져왔어요'); renderStats();
       } catch { toast('파일 형식이 맞지 않아요'); }
     };
     $('#btn-reset').onclick = () => {
       if (!confirm('즐겨찾기, 오답노트, 학습 기록을 모두 지울까요? 되돌릴 수 없어요.')) return;
+      save(K_RESET, new Date().toISOString());   // 다른 기기에도 지운 게 전해지게
       marks = {}; days = {}; save(K_MARKS, marks); save(K_DAYS, days); toast('지웠어요'); renderStats();
     };
   }
@@ -1236,19 +1381,29 @@
     } catch (e) { SYNC.err = '동기화 모듈을 불러오지 못했어요 (오프라인?)'; }
   }
   const userDoc = () => fbDb.collection('users').doc(SYNC.user.uid);
-  // 두 기기의 기록 합치기: 즐겨찾기는 하나라도 켜져 있으면 켜짐, 오답은 합집합, 횟수는 큰 쪽, 날짜는 이른/늦은 쪽
-  function mergeMarks(a = {}, b = {}) {
+  // 두 기기의 기록 합치기. 카드마다 더 최근에 바꾼 쪽(u)의 즐겨찾기·오답·복습 간격을 따른다 (해제·삭제도 전해진다).
+  // 바꾼 시각이 없는 예전 기록끼리는 합집합. 횟수는 큰 쪽, 처음 본 날은 이른 쪽, 마지막 출제는 늦은 쪽.
+  // R: "모두 지우기" 시각. 그보다 전에 바뀐 기록은 버린다
+  function mergeMarks(a = {}, b = {}, R = '') {
     const out = {};
+    const alive = (x) => !!x && (!R || (x.u || '') > R);
     for (const id of new Set([...Object.keys(a), ...Object.keys(b)])) {
-      const x = a[id] || {}, y = b[id] || {}, m = {};
-      if (x.fav || y.fav) m.fav = true;
-      const w = { ...(x.wrong || {}), ...(y.wrong || {}) };
-      if (Object.keys(w).length) m.wrong = w;
+      const x = alive(a[id]) ? a[id] : {}, y = alive(b[id]) ? b[id] : {}, m = {};
+      if (x.u || y.u) {
+        const n = (x.u || '') >= (y.u || '') ? x : y;
+        if (n.fav) m.fav = true;
+        if (n.wrong && Object.keys(n.wrong).length) m.wrong = { ...n.wrong };
+        if (n.rv) m.rv = n.rv;
+        m.u = n.u;
+      } else {
+        if (x.fav || y.fav) m.fav = true;
+        const w = { ...(x.wrong || {}), ...(y.wrong || {}) };
+        if (Object.keys(w).length) m.wrong = w;
+        const rv = [x.rv, y.rv].filter(Boolean).sort((p, q) => (q.t || '').localeCompare(p.t || '') || p.d.localeCompare(q.d))[0]; if (rv) m.rv = rv;
+      }
       if (x.hist || y.hist) m.hist = { r: Math.max((x.hist || {}).r || 0, (y.hist || {}).r || 0), w: Math.max((x.hist || {}).w || 0, (y.hist || {}).w || 0) };
       const seen = [x.seen, y.seen].filter(Boolean).sort()[0]; if (seen) m.seen = seen;
       const last = [x.last, y.last].filter(Boolean).sort().pop(); if (last) m.last = last;
-      // 복습 간격은 더 최근에 채점된 쪽. 같은 날이면 복습일이 이른 쪽 (덜 외운 것으로 본다)
-      const rv = [x.rv, y.rv].filter(Boolean).sort((p, q) => (q.t || '').localeCompare(p.t || '') || p.d.localeCompare(q.d))[0]; if (rv) m.rv = rv;
       if (Object.keys(m).length) out[id] = m;
     }
     return out;
@@ -1264,7 +1419,10 @@
   // 받은 기록을 폰 기록과 합쳐 저장하고, 화면이 기록을 보여 주는 중이면 다시 그린다
   function applyRemote(d) {
     if (!d) return;
-    const m2 = mergeMarks(marks, d.marks), d2 = mergeDays(days, d.days);
+    // 어느 쪽이든 더 나중에 "모두 지우기"를 했으면 그 전 기록은 버린다. 학습한 날은 지우기를 못 본 쪽 것을 버린다
+    const mine = load(K_RESET, ''), theirs = d.resetAt || '', R = [mine, theirs].sort().pop();
+    const m2 = mergeMarks(marks, d.marks, R), d2 = mergeDays(R && mine !== R ? {} : days, R && theirs !== R ? {} : d.days);
+    if (R && R !== mine) save(K_RESET, R);
     const changed = JSON.stringify(m2) !== JSON.stringify(marks) || JSON.stringify(d2) !== JSON.stringify(days);
     marks = m2; days = d2;
     try { localStorage.setItem(K_MARKS, JSON.stringify(marks)); localStorage.setItem(K_DAYS, JSON.stringify(days)); } catch {}
@@ -1295,7 +1453,7 @@
     if (!SYNC.ready || !SYNC.user || SYNC.busy) return;
     SYNC.busy = true;
     try {
-      await userDoc().set({ marks, days, updatedAt: new Date().toISOString(), device: navigator.userAgent.slice(0, 60) }, { merge: false });
+      await userDoc().set({ marks, days, resetAt: load(K_RESET, ''), updatedAt: new Date().toISOString(), device: navigator.userAgent.slice(0, 60) }, { merge: false });
       SYNC.last = new Date().toISOString(); save('eng-sync-at', SYNC.last); SYNC.err = '';
     } catch (e) { SYNC.err = '올리지 못했어요. 다시 시도해요'; }
     SYNC.busy = false; paintSync();
@@ -1363,9 +1521,9 @@
   });
 
   let toastTimer;
-  function toast(msg) {
+  function toast(msg, ms = 1500) {
     const el = $('#toast'); el.textContent = msg; el.hidden = false;
-    clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, 1500);
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, ms);
   }
 
   async function init() {
@@ -1378,7 +1536,11 @@
     try { grammar = await (await fetch('grammar.json', { cache: 'no-cache' })).json(); } catch {}
     try { course = await (await fetch('course.json', { cache: 'no-cache' })).json(); } catch {}
     selectTab(location.hash.startsWith('#g/') ? 'grammar' : 'home');
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+      // 앱은 저장된 데이터로 바로 열리고, 새 데이터는 뒤에서 받는다 (sw.js). 받았으면 알려 준다
+      navigator.serviceWorker.addEventListener('message', (e) => { if (e.data && e.data.type === 'updated') toast('새 내용을 받았어요. 다음에 열 때 반영돼요', 3500); });
+    }
     if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});   // 브라우저가 오래 안 쓴 사이트 데이터를 지우지 않게
     initSync();
   }
