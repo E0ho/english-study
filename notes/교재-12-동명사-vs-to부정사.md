@@ -68,7 +68,7 @@ unit: 12
 ### Stop ~ing
 - 뜻: ~하는 거 그만해
 - 예문: {{Stop}} worrying about it.
-  - 해석: 그 일 {{그만}} 걱정해.
+  - 해석: 그거 걱정 {{그만해}}.
   - 문법: 동명사 목적어 (stop + -ing: 하던 걸 멈추다)
   - 문법: 전치사 about (worry about + 대상)
 - 예문: I {{stopped}} eating late at night.
@@ -85,7 +85,7 @@ unit: 12
 - 예문: {{Thanks for}} letting me know.
   - 해석: {{알려 줘서 고마워}}.
   - 문법: 동명사 (전치사 for 뒤라서 letting)
-  - 문법: 5형식 문장 (let + me + know: 내가 알게 하다)
+  - 문법: 사역동사 (let + me + know: 내가 알게 해 주다)
 - 메모: 전치사 뒤는 무조건 -ing. Thanks for your help. 처럼 명사도 된다.
 
 ### I'm looking forward to ~ing

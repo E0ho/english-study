@@ -116,4 +116,4 @@ at, about, for, of, in, without 같은 **전치사 뒤에 동사가 오면 -ing*
 - **want -ing, decide -ing.** 틀립니다. want to, decide to입니다.
 - **look forward to see you.** to가 전치사라서 `to seeing you`입니다.
 - **stop to smoke를 "담배를 끊다"로 쓰기.** 그건 `stop smoking`입니다. `stop to smoke`는 "담배 피우려고 멈추다"입니다.
-- **I'm interested to ~.** interested in -ing입니다. 전치사 in 뒤라서 -ing입니다.
+- **I'm interested to learn ~ ("~에 관심 있다"는 뜻으로).** 관심은 interested in -ing입니다. 전치사 in 뒤라서 -ing입니다.
